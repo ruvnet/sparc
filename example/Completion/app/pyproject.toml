@@ -12,6 +12,7 @@ uvicorn = "^0.22.0"
 python-jose = "^3.3.0"
 PyJWT = "^2.6.0"
 pydantic = "^1.10.2"
+python-multipart = "^0.0.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.3.1"
