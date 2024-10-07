@@ -1,0 +1,20 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Define specific file types as binary to prevent Git from attempting to diff them
+*.png binary
+*.jpg binary
+*.gif binary
+*.pdf binary
+
+# Enforce LF line endings for scripts and config files
+*.sh text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+# Custom diff for Markdown files
+*.md diff=markdown
+
+# Suppress whitespace errors for specific files
+/docs/* -text

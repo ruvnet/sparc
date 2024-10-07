@@ -1,0 +1,18 @@
+# This is a comment
+# Each line is a file pattern followed by one or more owners.
+
+# Owners for all files
+* @yourusername
+
+# Owners for documentation
+/docs/ @docsteam
+
+# Owners for frontend code
+/src/frontend/ @frontendteam
+
+# Owners for backend code
+/src/backend/ @backendteam
+
+# Specific file type
+*.js @javascriptowner
+*.py @pythonowner

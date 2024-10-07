@@ -1,5 +1,10 @@
 # SPARC Framework
 
+![CI](https://github.com/yourusername/sparc-framework/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/github/license/yourusername/sparc-framework)
+![GitHub issues](https://img.shields.io/github/issues/yourusername/sparc-framework)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/yourusername/sparc-framework)
+
 ## Introduction
 
 The **SPARC Framework** is a comprehensive methodology designed to guide the development of robust and scalable applications. SPARC stands for **Specification**, **Pseudocode**, **Architecture**, **Refinement**, and **Completion**. Each step ensures thorough planning, execution, and reflection throughout the project lifecycle.
