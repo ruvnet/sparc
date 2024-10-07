@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "agentic-preview"
+version = "0.1.0"
+description = "Agentic Preview Backend Service"
+authors = ["Your Name"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+fastapi = "^0.115.0"
+uvicorn = {extras = ["standard"], version = "^0.31.0"}
+pydantic = "^2.9.2"
+python-dotenv = "^0.21.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

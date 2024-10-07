@@ -1,0 +1,42 @@
+hello
+
+Created by ruv
+
+Repository Overview
+
+This git repository contains multiple projects and components:
+
+1. Agentic Editor (agentic_editor/)
+   - Main application file: main.py
+   - Database: projects.db, aider_projects.db
+   - Models: User, Project
+   - Configuration: AiderConfig
+   - Key functions:
+     - Database operations (init_db, get_db)
+     - Project management (update_project_user_data, remove_old_projects, cleanup_projects)
+     - Output processing (stream_aider_output, process_aider_output)
+     - Cost tracking (update_project_cost)
+
+2. Agentic Preview (agentic_preview/)
+   - Main application file: main.py
+   - Key functions:
+     - Command execution (execute_command)
+     - App deployment and management (deploy_app, stop_instance)
+     - File operations (explore_directory, modify_file, create_file, remove_file)
+     - Dockerfile creation (create_dockerfile)
+   - Logging functionality (stream_logs)
+
+3. Various test projects:
+   - cleanup_test
+   - cost-test_test
+   - sonnet_test
+   - sqlalchemy_test
+
+4. Configuration and setup files:
+   - pyproject.toml
+   - poetry.lock
+   - start.sh
+   - flyio-install.sh
+
+Last updated: 2024-10-07
+This overview is part of a git repository.
