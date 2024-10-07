@@ -9,7 +9,7 @@ license = "MIT"
 python = "^3.8"
 fastapi = "^0.95.1"
 uvicorn = "^0.22.0"
-python-jose = "^3.4.0"
+python-jose = "^3.3.0"
 PyJWT = "^2.6.0"
 pydantic = "^1.10.2"
 
