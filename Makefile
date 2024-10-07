@@ -1,10 +1,9 @@
 install:
-	npm install
-	pip install -r requirements.txt
+	./install.sh
 
 test:
+	poetry run pytest
 	npm test
-	pytest
 
 build:
 	docker build -t sparc-framework .

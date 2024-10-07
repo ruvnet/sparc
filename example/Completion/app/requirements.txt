@@ -1,5 +1,1 @@
-fastapi
-uvicorn
-python-jose
-PyJWT
-pydantic
+# This file is now managed by Poetry. Remove it if not needed.
