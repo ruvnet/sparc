@@ -9,8 +9,10 @@ Create a pseudocode outline serving as a development roadmap.
 - Identify key functions, classes, and modules.
 - Include inline comments explaining the purpose of code blocks.
 - Use placeholders for complex implementations with notes on what needs development.
+- Ensure pseudocode is modular and reusable.
 
 ## Reflection
 - Ensure alignment with the specifications.
 - Identify potential logical issues or inefficiencies.
 - Consider alternative approaches to algorithms and data handling.
+- Reflect on the clarity and readability of the pseudocode.
