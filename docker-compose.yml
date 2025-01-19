@@ -1,10 +1,66 @@
 version: '3.8'
 services:
-  app:
-    build: .
+  backend:
+    build: 
+      context: ./backend
+      target: development
     ports:
-      - "3000:3000"
+      - "8000:8000"
     volumes:
-      - .:/app
+      - ./backend:/app
+      - /app/node_modules  # Prevents overwriting node_modules
+    environment:
+      - ENVIRONMENT=development
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    develop:
+      watch:
+        - path: ./backend
+          target: /app
+          action: sync
+
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules  # Prevents overwriting node_modules
     environment:
       - NODE_ENV=development
+      - REACT_APP_API_URL=http://backend:8000
+    env_file:
+      - .env
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    develop:
+      watch:
+        - path: ./frontend
+          target: /app
+          action: sync
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3

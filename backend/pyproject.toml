@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "sparc-backend"
+version = "0.1.0"
+description = "SPARC Framework Backend with LLM Integration"
+authors = ["SPARC Team"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pygments = "^2.17.2"
+fastapi = "^0.109.0"
+uvicorn = "^0.25.0"
+google-cloud-aiplatform = "^1.38.1"
+python-dotenv = "^1.0.0"
+pytest = "^7.4.3"
+httpx = "^0.25.2"
+pydantic = "^2.5.2"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
