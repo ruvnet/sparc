@@ -1,0 +1,5 @@
+{
+  "command": "python",
+  "args": ["app.py"],
+  "env": {}
+}

@@ -1,0 +1,5 @@
+aider-chat>=0.72.0
+playwright>=1.49.0
+pytest-timeout>=2.2.0
+pytest>=7.0.0
+python-dotenv>=0.19.0

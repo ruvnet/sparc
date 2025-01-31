@@ -84,28 +84,26 @@ pip install -e .
 
 ### Environment Setup
 
-Create a `.env` file in your project root with the following variables:
+Environment variables are automatically managed in `$HOME/.sparc_exports` and sourced in your shell's RC file.
+
+Required API Keys:
+- ANTHROPIC_API_KEY - Get it from: https://console.anthropic.com/account/keys
+
+Optional API Keys:
+- OPENAI_API_KEY - Get it from: https://platform.openai.com/api-keys
+- OPENROUTER_KEY - Get it from: https://openrouter.ai/keys
+- GEMINI_API_KEY - Get it from: https://makersuite.google.com/app/apikey
+- VERTEXAI_PROJECT and VERTEXAI_LOCATION - Configure in Google Cloud Console
+
+The installation script supports both local Python and Docker-based installations. Choose the installation method that best suits your needs:
 
 ```bash
-# Required: At least one of these LLM provider API keys
-ANTHROPIC_API_KEY=your_anthropic_key    # Required for Claude models
-OPENAI_API_KEY=your_openai_key          # Required for GPT models
-OPENROUTER_API_KEY=your_openrouter_key  # Required for OpenRouter
+# Local Python Installation
+./install.sh
 
-# Optional: Expert knowledge configuration
-EXPERT_PROVIDER=openai                   # Default provider for expert queries (anthropic|openai|openrouter)
-EXPERT_MODEL=o1-preview                  # Model to use for expert knowledge queries
-
-# Optional: Default provider settings
-DEFAULT_PROVIDER=anthropic               # Default LLM provider (anthropic|openai|openrouter)
-DEFAULT_MODEL=claude-3-opus-20240229     # Default model name
-
-# Optional: Development settings
-DEBUG=false                              # Enable debug logging
-COWBOY_MODE=false                        # Skip command approval prompts
+# Docker Installation
+./install.sh --docker
 ```
-
-Note: At least one provider API key must be configured for SPARC to function.
 
 ## Usage
 

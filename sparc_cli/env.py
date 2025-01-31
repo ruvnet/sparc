@@ -4,8 +4,26 @@ import os
 import sys
 from dataclasses import dataclass
 from typing import Tuple, List
+from pathlib import Path
 
 from sparc_cli.console.formatting import print_error
+from dotenv import load_dotenv
+import shutil
+
+def load_environment() -> bool:
+    """Load environment variables from .env file.
+    
+    Returns:
+        bool: True if .env loaded successfully, False otherwise
+    """
+    env_path = Path('.env')
+    if not env_path.exists():
+        print_error(".env file not found in current directory")
+        print_error("Please copy sample.env to .env and configure your API keys")
+        return False
+        
+    load_dotenv()
+    return True
 
 @dataclass
 class ProviderConfig:
@@ -36,6 +54,9 @@ def validate_environment(args) -> Tuple[bool, List[str]]:
     Raises:
         SystemExit: If required base environment variables are missing
     """
+    # Load environment variables from .env file
+    load_environment()
+    
     missing = []
     provider = args.provider
     expert_provider = args.expert_provider

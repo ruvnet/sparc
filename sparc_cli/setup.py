@@ -1,5 +1,9 @@
-from setuptools import setup, find_packages
+import dotenv
 from pathlib import Path
+from setuptools import setup, find_packages
+
+# load .env
+dotenv.load_dotenv()
 
 # Read the contents of README.md
 this_directory = Path(__file__).parent

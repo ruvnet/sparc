@@ -43,7 +43,13 @@ setup_environment() {
     # Create exports file
     local exports_file="$HOME/.sparc_exports"
     
+    echo "The following API keys are used to access different AI models:"
+    echo
+    
     # Always require ANTHROPIC_API_KEY
+    echo "ANTHROPIC_API_KEY (Required)"
+    echo "- Used for Claude models from Anthropic"
+    echo "- Get it from: https://console.anthropic.com/account/keys"
     while true; do
         ANTHROPIC_API_KEY=$(prompt_secret "ANTHROPIC_API_KEY" "true")
         if [ $? -eq 0 ] && [ -n "$ANTHROPIC_API_KEY" ]; then
@@ -51,13 +57,42 @@ setup_environment() {
         fi
         echo "ANTHROPIC_API_KEY is required. Please try again."
     done
+    echo
     
-    # Optional keys
+    # Optional keys with descriptions
+    echo "OPENAI_API_KEY (Optional)"
+    echo "- Used for GPT models from OpenAI"
+    echo "- Get it from: https://platform.openai.com/api-keys"
     OPENAI_API_KEY=$(prompt_secret "OPENAI_API_KEY" "false")
+    echo
+    
+    echo "OPENROUTER_KEY (Optional)"
+    echo "- Used to access multiple AI models through a single API"
+    echo "- Get it from: https://openrouter.ai/keys"
     OPENROUTER_KEY=$(prompt_secret "OPENROUTER_KEY" "false")
+    echo
+    
+    echo "ENCRYPTION_KEY (Optional)"
+    echo "- Used for secure storage of sensitive data"
+    echo "- Can be any string you choose"
     ENCRYPTION_KEY=$(prompt_secret "ENCRYPTION_KEY" "false")
+    echo
+    
+    echo "GEMINI_API_KEY (Optional)"
+    echo "- Used for Google's Gemini models"
+    echo "- Get it from: https://makersuite.google.com/app/apikey"
     GEMINI_API_KEY=$(prompt_secret "GEMINI_API_KEY" "false")
+    echo
+    
+    echo "VERTEXAI_PROJECT (Optional)"
+    echo "- Your Google Cloud project ID for Vertex AI"
+    echo "- Find it in your Google Cloud Console"
     VERTEXAI_PROJECT=$(prompt_secret "VERTEXAI_PROJECT" "false")
+    echo
+    
+    echo "VERTEXAI_LOCATION (Optional)"
+    echo "- Geographic location for Vertex AI services (e.g., us-central1)"
+    echo "- See: https://cloud.google.com/vertex-ai/docs/general/locations"
     VERTEXAI_LOCATION=$(prompt_secret "VERTEXAI_LOCATION" "false")
     
     # Create exports file

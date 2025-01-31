@@ -46,3 +46,24 @@ sparc scrape --url "https://example.com" --selector "article.content" --format j
 - [Architecture](architecture.md) - System design and components
 
 For installation and getting started, please refer to the [Usage Guide](usage.md).
+
+### Environment Setup
+
+Environment variables are automatically managed in `$HOME/.sparc_exports` and sourced in your shell's RC file.
+
+Required API Keys:
+- ANTHROPIC_API_KEY - Get it from: https://console.anthropic.com/account/keys
+
+Optional API Keys:
+- OPENAI_API_KEY - Get it from: https://platform.openai.com/api-keys
+- OPENROUTER_KEY - Get it from: https://openrouter.ai/keys
+- GEMINI_API_KEY - Get it from: https://makersuite.google.com/app/apikey
+- VERTEXAI_PROJECT and VERTEXAI_LOCATION - Configure in Google Cloud Console
+
+The installation script supports both local Python and Docker-based installations. Choose the installation method that best suits your needs:
+
+```bash
+./install.sh
+
+./install.sh --docker
+```
