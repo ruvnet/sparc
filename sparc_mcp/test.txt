@@ -1,4 +1,4 @@
-curl https://api.openai.com/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer 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" -d '{
+curl https://api.openai.com/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer <<TOKEN>>" -d '{
     "model": "gpt-4o-mini",
     "store": true,
     "messages": [
