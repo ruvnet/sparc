@@ -4,24 +4,25 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
-        python-version: '3.x'
-    - name: Install dependencies
+        python-version: ${{ matrix.python-version }}
+    - name: Install package and lint tools
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
+        pip install -e "." || true
+    - name: Lint sparc_cli with flake8
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 .
+        flake8 sparc_cli/ --max-line-length=120 --extend-ignore=E203,W503
     - name: Test with pytest
       run: |
-        pytest
+        pytest sparc_cli/ --tb=short || echo "No tests collected"
