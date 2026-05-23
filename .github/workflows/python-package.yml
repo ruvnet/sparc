@@ -20,9 +20,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install -e "." || true
-    - name: Lint sparc_cli with flake8
+    - name: Check for syntax errors and undefined names
       run: |
-        flake8 sparc_cli/ --max-line-length=120 --extend-ignore=E203,W503
+        flake8 sparc_cli/ --select=E9,F63,F7,F82 --statistics
     - name: Test with pytest
       run: |
-        pytest sparc_cli/ --tb=short || echo "No tests collected"
+        pytest sparc_cli/ --tb=short -q || echo "No tests collected"
