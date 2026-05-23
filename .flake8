@@ -1,0 +1,12 @@
+[flake8]
+max-line-length = 120
+extend-ignore = E203, W503
+exclude =
+    example/,
+    .git,
+    __pycache__,
+    build/,
+    dist/,
+    *.egg-info/
+per-file-ignores =
+    sparc_cli/install.sh:*
