@@ -8,5 +8,3 @@ exclude =
     build/,
     dist/,
     *.egg-info/
-per-file-ignores =
-    sparc_cli/install.sh:*
