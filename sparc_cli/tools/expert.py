@@ -125,8 +125,6 @@ def ask_expert(question: str) -> str:
 
     The expert can be prone to overthinking depending on what and how you ask it.
     """
-    global expert_context
-    
     # Get all content first
     file_paths = expert_context['files'] + list(get_related_files())
     related_contents = read_related_files(file_paths)
