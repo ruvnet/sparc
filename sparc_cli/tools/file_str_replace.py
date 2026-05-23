@@ -1,9 +1,17 @@
+import os
 from langchain_core.tools import tool
 from typing import Dict
 from pathlib import Path
 from rich.panel import Panel
 from sparc_cli.console import console
 from sparc_cli.console.formatting import print_error
+
+
+def _check_safe_path(filepath: str) -> None:
+    safe_root = Path.cwd().resolve()
+    resolved = Path(filepath).resolve()
+    if not (str(resolved).startswith(str(safe_root) + os.sep) or resolved == safe_root):
+        raise PermissionError(f"Access denied: path outside working directory: {filepath}")
 
 def truncate_display_str(s: str, max_length: int = 30) -> str:
     """Truncate a string for display purposes if it exceeds max length.
@@ -52,6 +60,7 @@ def file_str_replace(
             - success: Whether the operation succeeded
             - message: Success confirmation or error details
     """
+    _check_safe_path(filepath)
     try:
         path = Path(filepath)
         if not path.exists():

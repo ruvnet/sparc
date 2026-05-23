@@ -341,7 +341,7 @@ def run_agent_with_retry(agent, prompt: str, config: dict) -> Optional[str]:
 
                     if attempt == max_retries - 1:
                         raise RuntimeError(f"Max retries ({max_retries}) exceeded. Last error: {e}")
-                    delay = base_delay * (2 ** attempt)
+                    delay = min(base_delay * (2 ** attempt), 60)
                     print_error(f"Encountered {e.__class__.__name__}: {e}. Retrying in {delay}s... (Attempt {attempt+1}/{max_retries})")
                     start = time.monotonic()
                     while time.monotonic() - start < delay:

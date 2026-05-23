@@ -1,7 +1,7 @@
 from typing import List, Tuple
 import fnmatch
 from git import Repo
-from fuzzywuzzy import process
+from rapidfuzz import process
 from langchain_core.tools import tool
 from rich.console import Console
 from rich.panel import Panel

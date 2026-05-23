@@ -2,11 +2,20 @@ import os
 import logging
 import time
 from typing import Dict
+from pathlib import Path
 from langchain_core.tools import tool
 from rich.console import Console
 from rich.panel import Panel
 
 console = Console()
+
+
+def _check_safe_path(filepath: str) -> None:
+    safe_root = Path.cwd().resolve()
+    resolved = Path(filepath).resolve()
+    if not (str(resolved).startswith(str(safe_root) + os.sep) or resolved == safe_root):
+        raise PermissionError(f"Access denied: path outside working directory: {filepath}")
+
 
 @tool
 def write_file_tool(
@@ -33,6 +42,7 @@ def write_file_tool(
     Raises:
         RuntimeError: If file cannot be written
     """
+    _check_safe_path(filepath)
     start_time = time.time()
     result = {
         "success": False,

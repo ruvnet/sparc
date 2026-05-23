@@ -4,6 +4,7 @@ import uuid
 from rich.panel import Panel
 from rich.console import Console
 from sparc_cli.console.formatting import print_interrupt
+from sparc_cli.__version__ import __version__
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 from sparc_cli.env import validate_environment
@@ -37,6 +38,11 @@ Examples:
     sparc -m "Add error handling to the database module"
     sparc -m "Explain the authentication flow" --research-only
         '''
+    )
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=f'%(prog)s {__version__}'
     )
     parser.add_argument(
         '--non-interactive',
@@ -102,7 +108,7 @@ Examples:
     # Set default model for Anthropic, require model for other providers
     if args.provider == 'anthropic':
         if not args.model:
-            args.model = 'claude-3-5-sonnet-20241022'
+            args.model = 'claude-3-5-sonnet-latest'
     elif not args.model:
         parser.error(f"--model is required when using provider '{args.provider}'")
     

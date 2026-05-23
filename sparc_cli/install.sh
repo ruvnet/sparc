@@ -72,8 +72,8 @@ export VERTEXAI_PROJECT='${VERTEXAI_PROJECT}'
 export VERTEXAI_LOCATION='${VERTEXAI_LOCATION}'
 EOF
     
-    # Make exports file executable
-    chmod +x "$exports_file"
+    # Restrict exports file permissions (contains secrets)
+    chmod 600 "$exports_file"
     
     # Source the exports file
     source "$exports_file"

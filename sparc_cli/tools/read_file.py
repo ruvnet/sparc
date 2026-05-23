@@ -1,7 +1,9 @@
+import os
 import os.path
 import logging
 import time
 from typing import Dict, Optional, Tuple
+from pathlib import Path
 from langchain_core.tools import tool
 from rich.console import Console
 from rich.panel import Panel
@@ -11,6 +13,14 @@ console = Console()
 
 # Standard buffer size for file reading
 CHUNK_SIZE = 8192
+
+
+def _check_safe_path(filepath: str) -> None:
+    safe_root = Path.cwd().resolve()
+    resolved = Path(filepath).resolve()
+    if not (str(resolved).startswith(str(safe_root) + os.sep) or resolved == safe_root):
+        raise PermissionError(f"Access denied: path outside working directory: {filepath}")
+
 
 @tool
 def read_file_tool(
@@ -32,6 +42,7 @@ def read_file_tool(
     Raises:
         RuntimeError: If file cannot be read or does not exist
     """
+    _check_safe_path(filepath)
     start_time = time.time()
     try:
         if not os.path.exists(filepath):
