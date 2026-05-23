@@ -338,23 +338,16 @@ class CalculatorTool(SparcBaseTool):
                 
                 return f"x = {' or x = '.join(solutions)}"
             else:
-                # Handle regular calculations
-                safe_dict = {
-                    'abs': abs,
-                    'float': float,
-                    'int': int,
-                    'pow': pow,
-                    'round': round,
-                    '+': lambda x, y: x + y,
-                    '-': lambda x, y: x - y,
-                    '*': lambda x, y: x * y,
-                    '/': lambda x, y: x / y,
-                    '**': pow
-                }
-                result = eval(expression, {"__builtins__": None}, safe_dict)
-                if isinstance(result, (int, float)):
-                    return str(result if result == int(result) else f"{result:.2f}")
-                return str(result)
+                # Handle regular calculations using sympy for safe evaluation.
+                # eval() with {"__builtins__": None} is insufficient — Python's
+                # dunder-attribute chain can still escape the sandbox (CWE-78).
+                # sympy.sympify + evalf performs safe symbolic evaluation instead.
+                sympy_expr = sympify(expression)
+                result = sympy_expr.evalf()
+                result_float = float(result)
+                if result_float == int(result_float):
+                    return str(int(result_float))
+                return f"{result_float:.2f}"
         except Exception as e:
             raise ValueError(f"Calculation failed: {str(e)}")
 

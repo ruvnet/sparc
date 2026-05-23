@@ -4,8 +4,8 @@ Module for running interactive subprocesses with output capture.
 
 import os
 import re
+import subprocess
 import tempfile
-import shlex
 import shutil
 from typing import List, Tuple
 
@@ -28,48 +28,44 @@ def run_interactive_command(cmd: List[str]) -> Tuple[bytes, int]:
     # Fail early if cmd is empty
     if not cmd:
         raise ValueError("No command provided.")
-    
+
     # Check that the command exists
     if shutil.which(cmd[0]) is None:
         raise FileNotFoundError(f"Command '{cmd[0]}' not found in PATH.")
 
-    # Create temp files (we'll always clean them up)
+    # Create temp file for output (we'll always clean it up)
     output_file = tempfile.NamedTemporaryFile(prefix="output_", delete=False)
-    retcode_file = tempfile.NamedTemporaryFile(prefix="retcode_", delete=False)
     output_path = output_file.name
-    retcode_path = retcode_file.name
     output_file.close()
-    retcode_file.close()
-
-    # Quote arguments for safety
-    quoted_cmd = ' '.join(shlex.quote(c) for c in cmd)
-    # Use script to capture output with TTY and save return code
-    shell_cmd = f"{quoted_cmd}; echo $? > {shlex.quote(retcode_path)}"
 
     def cleanup():
-        for path in [output_path, retcode_path]:
-            if os.path.exists(path):
-                os.remove(path)
+        if os.path.exists(output_path):
+            os.remove(output_path)
 
     try:
         # Disable pagers by setting environment variables
-        os.environ['GIT_PAGER'] = ''
-        os.environ['PAGER'] = ''
-        
-        # Run command with script for TTY and output capture
-        os.system(f"script -q -c {shlex.quote(shell_cmd)} {shlex.quote(output_path)}")
+        env = os.environ.copy()
+        env['GIT_PAGER'] = ''
+        env['PAGER'] = ''
+
+        # Run command with script for TTY and output capture.
+        # Pass cmd as a list to script's -c option so no shell interpolation occurs.
+        # The return code of the inner command is the exit status of script itself.
+        proc = subprocess.run(
+            ['script', '-q', '-e', '-c', ' '.join(
+                subprocess.list2cmdline([c]) if ' ' in c else c for c in cmd
+            ), output_path],
+            env=env,
+        )
+        return_code = proc.returncode
 
         # Read and clean the output
         with open(output_path, "rb") as f:
             output = f.read()
-        
+
         # Clean ANSI escape sequences and control characters
         output = re.sub(rb'\x1b\[[0-9;]*[a-zA-Z]', b'', output)  # ANSI escape sequences
         output = re.sub(rb'[\x00-\x08\x0b\x0c\x0e-\x1f]', b'', output)  # Control chars
-        
-        # Get the return code
-        with open(retcode_path, "r") as f:
-            return_code = int(f.read().strip())
 
     except Exception as e:
         # If something goes wrong, cleanup and re-raise

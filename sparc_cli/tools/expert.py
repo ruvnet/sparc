@@ -1,5 +1,6 @@
 from typing import List
 import os
+from pathlib import Path
 from langchain_core.tools import tool
 from rich.console import Console
 from rich.panel import Panel
@@ -54,27 +55,38 @@ def emit_expert_context(context: str) -> str:
     
     return f"Context added."
 
+def _check_safe_path(filepath: str) -> None:
+    """Raise PermissionError if filepath resolves outside the working directory."""
+    safe_root = Path.cwd().resolve()
+    resolved = Path(filepath).resolve()
+    if not (str(resolved).startswith(str(safe_root) + os.sep) or resolved == safe_root):
+        raise PermissionError(f"Access denied: path outside working directory: {filepath}")
+
+
 def read_files_with_limit(file_paths: List[str], max_lines: int = 10000) -> str:
     """Read multiple files and concatenate contents, stopping at line limit.
-    
+
     Args:
         file_paths: List of file paths to read
         max_lines: Maximum total lines to read (default: 10000)
-        
+
     Note:
         - Each file's contents will be prefaced with its path as a header
         - Stops reading files when max_lines limit is reached
         - Files that would exceed the line limit are truncated
+        - Files outside the working directory are rejected (path traversal guard)
     """
     total_lines = 0
     contents = []
-    
+
     for path in file_paths:
         try:
+            _check_safe_path(path)
+
             if not os.path.exists(path):
                 console.print(f"Warning: File not found: {path}", style="yellow")
                 continue
-                
+
             with open(path, 'r', encoding='utf-8') as f:
                 file_content = []
                 for i, line in enumerate(f):

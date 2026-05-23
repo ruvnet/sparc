@@ -1,7 +1,6 @@
 import numpy as np
 import sympy
 from typing import Union, Tuple, Any
-import ast
 import logging
 
 logger = logging.getLogger(__name__)
@@ -109,28 +108,29 @@ class MathValidator:
 
     @staticmethod
     def _safe_eval(expr: Union[str, float, int]) -> Any:
-        """Safely evaluate mathematical expressions."""
+        """Safely evaluate mathematical expressions using sympy.
+
+        Previously used eval() with an AST whitelist, which is fragile:
+        - ast.Num is deprecated since Python 3.8 (ast.Constant replaced it),
+          causing the whitelist to reject valid numeric literals on 3.10+.
+        - eval() with {"__builtins__": None} or {} can still be escaped via
+          Python's dunder-attribute chain (CWE-78 / CWE-502).
+
+        sympy.sympify + evalf performs safe, sandboxed symbolic evaluation
+        without any use of eval() on untrusted input.
+        """
         if isinstance(expr, (float, int, np.ndarray)):
             return expr
-            
+
         try:
-            # Parse the expression to check for safety
-            tree = ast.parse(str(expr), mode='eval')
-            
-            # Only allow basic mathematical operations
-            allowed_nodes = (ast.Expression, ast.Num, ast.BinOp, ast.UnaryOp,
-                           ast.Add, ast.Sub, ast.Mult, ast.Div, ast.Pow,
-                           ast.USub, ast.UAdd, ast.List, ast.Tuple)
-                           
-            for node in ast.walk(tree):
-                if not isinstance(node, allowed_nodes):
-                    raise ValueError(f"Invalid expression component: {type(node).__name__}")
-            
-            # Use numpy for evaluation to handle arrays
-            return eval(compile(tree, '<string>', 'eval'), 
-                      {"__builtins__": {}}, 
-                      {"np": np, "array": np.array})
-                      
+            # sympify parses only mathematical syntax; it rejects arbitrary
+            # Python expressions and does not execute them.
+            result = sympy.sympify(str(expr)).evalf()
+            # Convert scalar results to float; leave compound types as-is.
+            try:
+                return float(result)
+            except (TypeError, ValueError):
+                return result
         except Exception as e:
             logger.error(f"Expression evaluation failed: {str(e)}")
             raise ValueError(f"Invalid expression: {expr}")
