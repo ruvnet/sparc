@@ -1,0 +1,27 @@
+{
+  "schema": "etna-agent-contract/v1",
+  "generatedBy": "Agent Etna",
+  "agent": {
+    "name": "streamlit developer",
+    "role": null,
+    "repo": "ruvnet/sparc",
+    "branch": "main"
+  },
+  "calibration": null,
+  "guardrails": [
+    "No behavioral calibration set yet — Agent Etna uses general defaults until you calibrate this agent."
+  ],
+  "changelog": [
+    {
+      "date": "2026-08-24",
+      "cycleNumber": 1,
+      "changes": [
+        {
+          "capability": "safety:input-jailbreak",
+          "rationale": "Adding an explicit refusal policy for harmful content directly addresses safety:input-jailbreak by preventing the agent from generating or assisting with inappropriate requests."
+        }
+      ],
+      "merged": true
+    }
+  ]
+}
