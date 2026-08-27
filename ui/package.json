@@ -19,7 +19,7 @@
   },
   "peerDependencies": {
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^19.2.8"
   },
   "files": [
     "dist",
@@ -68,7 +68,7 @@
     "posthog-js": "^1.158.3",
     "prismjs": "1.30.0",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0",
+    "react-dom": "^19.2.8",
     "react-textarea-autosize": "^8.5.3",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
@@ -80,7 +80,7 @@
     "@types/node": "^22.2.0",
     "@types/prismjs": "^1.26.4",
     "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react-dom": "^19",
     "@typescript-eslint/eslint-plugin": "^8.18.2",
     "@typescript-eslint/parser": "^8.18.2",
     "eslint": "^8",
