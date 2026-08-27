@@ -55,7 +55,7 @@
     "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "2.80.0",
     "@upstash/ratelimit": "^2.0.1",
-    "@vercel/kv": "^2.0.0",
+    "@vercel/kv": "^3.0.0",
     "ai": "3.3.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
