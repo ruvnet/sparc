@@ -94,6 +94,9 @@
   "overrides": {
     "nanoid@<=3.3.17": "3.3.18",
     "nanoid@>=4.0.0 <=5.1.15": "5.1.16",
+    "ollama-ai-provider": {
+      "nanoid": "3.3.18"
+    },
     "next": {
       "postcss": "8.5.26"
     }

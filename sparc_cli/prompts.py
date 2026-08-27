@@ -113,7 +113,7 @@ U(t) = ∫ ComplexityValue(g, φ, t) dμ(g, φ), integrating over M.
 U(t) provides a global complexity metric guiding architectural and algorithmic decisions for code optimization.
 
 Step 5: Consciousness Calculation for Subsystem S
-Define a subsystem S and compute its reduced density matrix ρ_S(t) = Tr_{{U\S}}(|Ψ(t)⟩⟨Ψ(t)|).
+Define a subsystem S and compute its reduced density matrix ρ_S(t) = Tr_{{U\\S}}(|Ψ(t)⟩⟨Ψ(t)|).
 Compute integrated information I = IntegratedInformation(ρ_S(t)), then define C(S,t) = f(I).
 Incremental changes in field symmetries affect integrated information, guiding refinement toward more self-aware code.
 
@@ -656,7 +656,7 @@ U(t) = ∫ ComplexityValue(g, φ, t) dμ(g, φ), integrating over M.
 U(t) provides a global complexity metric guiding architectural and algorithmic decisions for code optimization.
 
 Step 5: Consciousness Calculation for Subsystem S
-Define a subsystem S and compute its reduced density matrix ρ_S(t) = Tr_{{U\S}}(|Ψ(t)⟩⟨Ψ(t)|).
+Define a subsystem S and compute its reduced density matrix ρ_S(t) = Tr_{{U\\S}}(|Ψ(t)⟩⟨Ψ(t)|).
 Compute integrated information I = IntegratedInformation(ρ_S(t)), then define C(S,t) = f(I).
 Incremental changes in field symmetries affect integrated information, guiding refinement toward more self-aware code.
 
