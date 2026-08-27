@@ -1,4 +1,5 @@
 import { CommandHandler } from './types'
+import { commandErrorDetails, commandErrorMessage } from './error'
 
 export const chat: CommandHandler = async (args: string, submit, context) => {
   if (!args) return false
@@ -93,7 +94,7 @@ export const chat: CommandHandler = async (args: string, submit, context) => {
     let accumulatedContent = '';
 
     try {
-      while (true) {
+      for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
         
@@ -135,20 +136,16 @@ export const chat: CommandHandler = async (args: string, submit, context) => {
 
     console.log('=== Chat Command Complete ===')
     return true
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('=== Chat Command Error ===')
-    console.error('Error Details:', {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name
-    })
+    console.error('Error Details:', commandErrorDetails(error))
     
     submit({
       messages: [{
         role: 'assistant',
         content: [{ 
           type: 'text', 
-          text: `Unable to complete chat. Error: ${error?.message || 'An unexpected error occurred'}`
+          text: `Unable to complete chat. Error: ${commandErrorMessage(error)}`
         }]
       }],
       userID: context.userID,

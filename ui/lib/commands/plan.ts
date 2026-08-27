@@ -1,4 +1,5 @@
 import { CommandHandler } from './types'
+import { commandErrorDetails, commandErrorMessage } from './error'
 
 export const plan: CommandHandler = async (args: string, submit, context) => {
   if (!args) return false
@@ -157,20 +158,16 @@ export const plan: CommandHandler = async (args: string, submit, context) => {
 
     console.log('=== Plan Command Complete ===')
     return true
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('=== Plan Command Error ===')
-    console.error('Error Details:', {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name
-    })
+    console.error('Error Details:', commandErrorDetails(error))
     
     submit({
       messages: [{
         role: 'assistant',
         content: [{ 
           type: 'text', 
-          text: `Unable to complete planning. Error: ${error?.message || 'An unexpected error occurred'}`
+          text: `Unable to complete planning. Error: ${commandErrorMessage(error)}`
         }]
       }],
       userID: context.userID,

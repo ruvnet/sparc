@@ -1,0 +1,16 @@
+{
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "statement": "State one observable requirement",
+      "inScope": true,
+      "acceptanceTestIds": ["TEST-1"]
+    }
+  ],
+  "acceptanceTests": [
+    {
+      "id": "TEST-1",
+      "description": "State objective evidence that proves REQ-1"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import { CommandHandler } from './types'
+import { commandErrorDetails, commandErrorMessage } from './error'
 
 export const pseudo: CommandHandler = async (args: string, submit, context) => {
   if (!args) return false
@@ -58,20 +59,16 @@ export const pseudo: CommandHandler = async (args: string, submit, context) => {
 
     console.log('=== Pseudo Command Complete ===')
     return true
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('=== Pseudo Command Error ===')
-    console.error('Error Details:', {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name
-    })
+    console.error('Error Details:', commandErrorDetails(error))
     
     submit({
       messages: [{
         role: 'assistant',
         content: [{ 
           type: 'text', 
-          text: `Unable to complete pseudocode analysis. Error: ${error?.message || 'An unexpected error occurred'}`
+          text: `Unable to complete pseudocode analysis. Error: ${commandErrorMessage(error)}`
         }]
       }],
       userID: context.userID,

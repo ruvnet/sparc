@@ -1,0 +1,19 @@
+{
+  "finalDiff": ["Summarize the final bounded change"],
+  "documentation": ["List updated operator and developer guidance"],
+  "observability": ["List production signals and ownership"],
+  "rollback": ["State the tested rollback path"],
+  "residualRisks": ["State remaining risk and owner"],
+  "requirementTrace": [
+    {
+      "requirementId": "REQ-1",
+      "evidenceRefs": [
+        {
+          "evidenceId": "EVIDENCE-1",
+          "version": 1,
+          "digest": "REPLACE_WITH_EXACT_EVIDENCE_DIGEST"
+        }
+      ]
+    }
+  ]
+}

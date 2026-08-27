@@ -76,6 +76,9 @@ def read_files_with_limit(file_paths: List[str], max_lines: int = 10000) -> str:
         - Files that would exceed the line limit are truncated
         - Files outside the working directory are rejected (path traversal guard)
     """
+    if isinstance(max_lines, bool) or not isinstance(max_lines, int) or max_lines < 1:
+        raise ValueError("max_lines must be a positive integer")
+
     total_lines = 0
     contents = []
 
@@ -153,7 +156,8 @@ def ask_expert(question: str) -> str:
         border_style="yellow"
     ))
     
-    # Clear context after panel display
+    # Snapshot and clear one-shot context before invoking the remote model.
+    additional_context = list(expert_context['text'])
     expert_context['text'].clear()
     expert_context['files'].clear()
     
@@ -169,8 +173,8 @@ def ask_expert(question: str) -> str:
     if key_facts and len(key_facts) > 0:
         query_parts.extend(['# Key Facts About This Project', key_facts])
         
-    if expert_context['text']:
-        query_parts.extend(['\n# Additional Context', '\n'.join(expert_context['text'])])
+    if additional_context:
+        query_parts.extend(['\n# Additional Context', '\n'.join(additional_context)])
         
     query_parts.extend(['# Question', question])
     query_parts.extend(['\n # Addidional Requirements', "Do not expand the scope unnecessarily."])

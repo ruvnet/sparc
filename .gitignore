@@ -124,6 +124,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
+!.env.example
 .venv
 env/
 venv/
@@ -154,6 +156,15 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Node and SPARC metaharness artifacts
+node_modules/
+dist/
+.sparc/
+*.tgz
+*.db
+*.sqlite
+*.sqlite3
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

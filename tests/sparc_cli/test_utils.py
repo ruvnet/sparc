@@ -8,10 +8,11 @@ def test_truncate_output():
     assert truncate_output(short) == short
     
     # Test long string (truncation)
-    long = "x" * 10000
+    long = "".join(f"line {index}\n" for index in range(5001))
     truncated = truncate_output(long)
-    assert len(truncated) < len(long)
-    assert "..." in truncated
+    assert "[1 lines of output truncated]" in truncated
+    assert "line 0\n" not in truncated
+    assert truncated.endswith("line 5000\n")
     
     # Test empty string
     assert truncate_output("") == ""

@@ -1,3 +1,23 @@
+import type { DeepPartial } from 'ai'
+
+import type { LLMModel, LLMModelConfig } from '../models'
+import type { FragmentSchema } from '../schema'
+import type { Templates } from '../templates'
+import type { ExecutionResult } from '../types'
+
+export type CommandConfig = LLMModelConfig & {
+  anthropicApiKey?: string
+  modelName?: string
+  skipAI?: boolean
+  forceTabSwitch?: 'code' | 'fragment'
+  setPreview?: {
+    fragment: DeepPartial<FragmentSchema>
+    result: ExecutionResult
+  }
+}
+
+export type CommandTemplate = Partial<Templates>
+
 export type SubmitParams = {
   messages: Array<{
     role: 'user' | 'assistant'
@@ -9,10 +29,10 @@ export type SubmitParams = {
     loading?: boolean
     streaming?: boolean
   }>
-  userID: string
-  template: any
-  model: any
-  config: any
+  userID: string | undefined
+  template: CommandTemplate
+  model: LLMModel | undefined
+  config: CommandConfig
   clearInput?: boolean
   updateLast?: boolean
 }
@@ -20,10 +40,10 @@ export type SubmitParams = {
 export type SubmitFunction = (params: SubmitParams) => void
 
 export type CommandContext = {
-  userID: string
-  template: any
-  model: any
-  config: any
+  userID: string | undefined
+  template: CommandTemplate
+  model: LLMModel | undefined
+  config: CommandConfig
   messages: Array<{
     role: 'user' | 'assistant'
     content: Array<{
@@ -43,7 +63,10 @@ export interface Command {
   name: string
   description: string
   handler: CommandHandler
-  preview?: (fragment: any, result: any) => {
+  preview?: (
+    fragment: DeepPartial<FragmentSchema>,
+    result: ExecutionResult,
+  ) => {
     title: string
     description: string
     files: Array<{

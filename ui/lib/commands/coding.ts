@@ -1,5 +1,4 @@
-import { Command, CommandHandler, CommandContext, SubmitFunction } from './types'
-import { toMessageImage, toAISDKMessages } from '../messages'
+import { Command, CommandContext, SubmitFunction } from './types'
 
 export const codingCommand: Command = {
   name: 'Coding',

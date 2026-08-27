@@ -1,4 +1,5 @@
 import { CommandHandler } from './types'
+import { commandErrorMessage } from './error'
 
 interface ResearchState {
   steps: string[]
@@ -111,7 +112,7 @@ export const research: CommandHandler = async (args: string, submit, context) =>
     })
 
     return true
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Research error:', error)
     
     submit({
@@ -119,7 +120,7 @@ export const research: CommandHandler = async (args: string, submit, context) =>
         role: 'assistant',
         content: [{ 
           type: 'text', 
-          text: `Unable to complete research analysis. Error: ${error?.message || 'An unexpected error occurred'}`
+          text: `Unable to complete research analysis. Error: ${commandErrorMessage(error)}`
         }]
       }],
       userID: context.userID,

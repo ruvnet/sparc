@@ -15,6 +15,10 @@ export function FragmentCode({
 }: {
   files: { name: string; content: string }[]
 }) {
+  const [selectedFileName, setSelectedFileName] = useState(files[0]?.name ?? '')
+  const selectedFile =
+    files.find((file) => file.name === selectedFileName) ?? files[0]
+
   if (!files.length) {
     return (
       <div className="flex flex-col h-full items-center justify-center text-muted-foreground">
@@ -23,10 +27,8 @@ export function FragmentCode({
     )
   }
 
-  const [currentFile, setCurrentFile] = useState(files[0].name)
-  const currentFileContent = files.find(
-    (file) => file.name === currentFile,
-  )?.content
+  const currentFile = selectedFile.name
+  const currentFileContent = selectedFile.content
 
   function download(filename: string, content: string) {
     const blob = new Blob([content], { type: 'text/plain' })
@@ -51,7 +53,7 @@ export function FragmentCode({
               className={`flex gap-2 select-none cursor-pointer items-center text-sm text-muted-foreground px-2 py-1 rounded-md hover:bg-muted border ${
                 file.name === currentFile ? 'bg-muted border-muted' : ''
               }`}
-              onClick={() => setCurrentFile(file.name)}
+              onClick={() => setSelectedFileName(file.name)}
             >
               <FileText className="h-4 w-4" />
               {file.name}

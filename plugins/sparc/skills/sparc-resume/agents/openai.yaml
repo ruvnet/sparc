@@ -1,0 +1,12 @@
+interface:
+  display_name: "SPARC Resume"
+  short_description: "Resume a run from verified persisted state"
+  default_prompt: "Use $sparc-resume to continue this run from its last verified phase."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sparc"
+      description: "Deterministic SPARC run state, gates, evidence, and trace"
+      transport: "stdio"
+policy:
+  allow_implicit_invocation: true

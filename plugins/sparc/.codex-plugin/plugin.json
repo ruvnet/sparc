@@ -1,0 +1,43 @@
+{
+  "name": "sparc",
+  "version": "1.0.0",
+  "description": "A deterministic SPARC metaharness with phase gates, immutable evidence, traceable receipts, and resumable delivery workflows.",
+  "author": {
+    "name": "ruvnet",
+    "url": "https://github.com/ruvnet"
+  },
+  "homepage": "https://github.com/ruvnet/SPARC",
+  "repository": "https://github.com/ruvnet/SPARC",
+  "license": "Apache-2.0",
+  "keywords": [
+    "sparc",
+    "metaharness",
+    "mcp",
+    "software-engineering",
+    "phase-gates",
+    "traceability"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "SPARC Metaharness",
+    "shortDescription": "Run evidence-gated SPARC delivery workflows",
+    "longDescription": "Plan, review, resume, and complete engineering work through Specification, Pseudocode, Architecture, Refinement, and Completion with deterministic gates, revision-safe mutations, immutable evidence, and an auditable trace.",
+    "developerName": "ruvnet",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/ruvnet/SPARC",
+    "privacyPolicyURL": "https://github.com/ruvnet/SPARC/security/policy",
+    "termsOfServiceURL": "https://github.com/ruvnet/SPARC/blob/main/LICENSE",
+    "defaultPrompt": [
+      "Start a SPARC run for this engineering goal",
+      "Review this SPARC run and identify gate blockers",
+      "Resume this SPARC run from its verified state"
+    ],
+    "brandColor": "#6D28D9"
+  }
+}

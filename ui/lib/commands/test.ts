@@ -1,5 +1,6 @@
 import { CommandHandler } from './types'
 import { ExecutionResult } from '../types'
+import { commandErrorMessage } from './error'
 
 export const test: CommandHandler = async (args: string, submit, context) => {
   // Ensure skipAI is false
@@ -112,14 +113,14 @@ export const test: CommandHandler = async (args: string, submit, context) => {
     })
 
     return true
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Test command error:', error)
     submit({
       messages: [{
         role: 'assistant',
         content: [{ 
           type: 'text',
-          text: `Failed to create test example: ${error.message}`
+          text: `Failed to create test example: ${commandErrorMessage(error)}`
         }]
       }],
       userID: context.userID,

@@ -1,0 +1,20 @@
+{
+  "name": "sparc",
+  "description": "A deterministic SPARC metaharness with phase gates, immutable evidence, traceable receipts, and resumable delivery workflows.",
+  "version": "1.0.0",
+  "author": {
+    "name": "ruvnet",
+    "url": "https://github.com/ruvnet"
+  },
+  "homepage": "https://github.com/ruvnet/SPARC",
+  "repository": "https://github.com/ruvnet/SPARC",
+  "license": "Apache-2.0",
+  "keywords": [
+    "sparc",
+    "metaharness",
+    "mcp",
+    "software-engineering",
+    "phase-gates",
+    "traceability"
+  ]
+}

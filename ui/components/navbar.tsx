@@ -16,11 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import {
-  DiscordLogoIcon,
-  GitHubLogoIcon,
-  TwitterLogoIcon,
-} from '@radix-ui/react-icons'
+import { GitHubLogoIcon } from '@radix-ui/react-icons'
 import { Session } from '@supabase/supabase-js'
 import { ArrowRight, LogOut, Trash, Undo, PanelRightClose, PanelRightOpen } from 'lucide-react'
 import Link from 'next/link'

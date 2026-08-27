@@ -1,0 +1,24 @@
+{
+  "verification": ["List the validation command and result"],
+  "preservedBehavior": ["Describe compatibility evidence"],
+  "requirementCoverage": [
+    {
+      "requirementId": "REQ-1"
+    }
+  ],
+  "increments": [
+    {
+      "id": "INCREMENT-1",
+      "description": "One bounded implementation increment",
+      "requirementIds": ["REQ-1"],
+      "evidenceRefs": [
+        {
+          "evidenceId": "EVIDENCE-1",
+          "version": 1,
+          "digest": "REPLACE_WITH_EXACT_EVIDENCE_DIGEST"
+        }
+      ],
+      "preservesBehavior": true
+    }
+  ]
+}

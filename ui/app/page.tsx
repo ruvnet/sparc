@@ -21,7 +21,7 @@ import { SubmitFunction, CommandContext } from '../lib/commands/types'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
 import { usePostHog } from 'posthog-js/react'
-import { SetStateAction, useEffect, useState } from 'react'
+import { SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 export default function Home() {
@@ -76,11 +76,24 @@ export default function Home() {
   const [authView, setAuthView] = useState<AuthViewType>('sign_in')
   const [isRateLimited, setIsRateLimited] = useState(false)
   const { session, apiKey } = useAuth(setAuthDialog, setAuthView)
-  
+  const autoChatStarted = useRef(false)
+  const currentModel = useMemo(
+    () => modelsList.models.find((model) => model.id === languageModel.model),
+    [languageModel.model],
+  )
+  const currentTemplate = useMemo(
+    () =>
+      selectedTemplate === 'auto'
+        ? templates
+        : { [selectedTemplate]: templates[selectedTemplate] },
+    [selectedTemplate],
+  )
+
   // Auto-chat initialization
   useEffect(() => {
-    if (session && messages.length === 0) {
-      handleCommand(
+    if (session && messages.length === 0 && !autoChatStarted.current) {
+      autoChatStarted.current = true
+      void handleCommand(
         '/chat Tell me about yourself', 
         (params) => {
           // Handle all messages, including streaming ones
@@ -126,7 +139,7 @@ export default function Home() {
           messages: [],
           defaultHandler: async (args: string, submit: SubmitFunction, context: CommandContext) => {
             const content: Message['content'] = [{ type: 'text', text: args }]
-            const newMessages = [...messages, {
+            const newMessages: Message[] = [{
               role: 'user' as const,
               content,
             }]
@@ -141,18 +154,15 @@ export default function Home() {
             return true
           }
         }
-      )
+      ).catch((commandError) => {
+        autoChatStarted.current = false
+        console.error(
+          'Automatic chat initialization failed:',
+          commandError instanceof Error ? commandError.message : 'UnknownError',
+        )
+      })
     }
-  }, [session, messages.length])
-
-  const currentModel = modelsList.models.find(
-    (model) => model.id === languageModel.model,
-  )
-  const currentTemplate =
-    selectedTemplate === 'auto'
-      ? templates
-      : { [selectedTemplate]: templates[selectedTemplate] }
-  const lastMessage = messages[messages.length - 1]
+  }, [currentModel, currentTemplate, languageModel, messages.length, session])
 
   const { object, submit, isLoading, stop, error } = useObject({
     api: currentModel?.id === 'o1-preview' || currentModel?.id === 'o1-mini'
@@ -237,26 +247,22 @@ export default function Home() {
         { type: 'code', text: codeContent },
       ]
 
-      if (!lastMessage || lastMessage.role !== 'assistant') {
-        addMessage({
-          role: 'assistant',
-          content,
-          object,
-        })
-      }
-
-      if (lastMessage && lastMessage.role === 'assistant') {
-        setMessage({
-          content,
-          object,
-        })
-      }
+      setMessages((previousMessages) => {
+        const previousMessage = previousMessages.at(-1)
+        if (previousMessage?.role === 'assistant') {
+          return [
+            ...previousMessages.slice(0, -1),
+            { ...previousMessage, content, object },
+          ]
+        }
+        return [...previousMessages, { role: 'assistant', content, object }]
+      })
     }
   }, [object])
 
   useEffect(() => {
     if (error) stop()
-  }, [error])
+  }, [error, stop])
 
   const handleSubmitAuth = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -428,9 +434,11 @@ export default function Home() {
   }
 
   const logout = () => {
-    supabase
-      ? supabase.auth.signOut()
-      : console.warn('Supabase is not initialized')
+    if (supabase) {
+      void supabase.auth.signOut()
+      return
+    }
+    console.warn('Supabase is not initialized')
   }
 
   const handleLanguageModelChange = (e: LLMModelConfig) => {

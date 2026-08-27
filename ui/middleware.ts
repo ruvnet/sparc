@@ -2,6 +2,10 @@ import { kv } from '@vercel/kv'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+// @vercel/kv uses the Upstash Node client. Declaring the runtime prevents
+// Next.js from bundling this middleware for Edge, where that client cannot run.
+export const runtime = 'nodejs'
+
 export async function middleware(req: NextRequest) {
   if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
     const id = req.nextUrl.pathname.split('/').pop()

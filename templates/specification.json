@@ -1,0 +1,18 @@
+{
+  "outcome": "Describe the observable outcome",
+  "businessValue": "Describe why this outcome matters",
+  "actors": ["Name every actor"],
+  "inputs": ["Name and bound every input"],
+  "outputs": ["Name every observable output"],
+  "assumptions": ["State each assumption"],
+  "constraints": ["State delivery and runtime constraints"],
+  "exclusions": ["State explicit non goals"],
+  "securityBoundaries": ["Describe identities, assets, and trust boundaries"],
+  "measurableSuccessCriteria": ["Define an objective pass condition"],
+  "requirementCoverage": [
+    {
+      "requirementId": "REQ-1",
+      "acceptanceTestIds": ["TEST-1"]
+    }
+  ]
+}

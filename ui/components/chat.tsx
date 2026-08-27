@@ -2,7 +2,8 @@ import { Message } from '@/lib/messages'
 import { FragmentSchema } from '@/lib/schema'
 import { ExecutionResult } from '@/lib/types'
 import { DeepPartial } from 'ai'
-import { Loader2Icon, LoaderIcon, Terminal, Search, BookOpen, Database, LineChart, Lightbulb } from 'lucide-react'
+import { LoaderIcon, Terminal, Search, BookOpen, Database, LineChart, Lightbulb } from 'lucide-react'
+import Image from 'next/image'
 import { useEffect } from 'react'
 
 export function Chat({
@@ -22,7 +23,7 @@ export function Chat({
     if (chatContainer) {
       chatContainer.scrollTop = chatContainer.scrollHeight
     }
-  }, [JSON.stringify(messages)])
+  }, [messages])
 
   return (
     <div
@@ -53,10 +54,13 @@ export function Chat({
             }
             if (content.type === 'image') {
               return (
-                <img
+                <Image
                   key={id}
                   src={content.image}
                   alt="fragment"
+                  width={48}
+                  height={48}
+                  unoptimized
                   className="mr-2 inline-block w-12 h-12 object-cover rounded-lg bg-white mb-2"
                 />
               )

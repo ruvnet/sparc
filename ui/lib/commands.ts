@@ -1,4 +1,4 @@
-import { Command, CommandContext, CommandRegistry, SubmitFunction } from './commands/types'
+import { CommandContext, CommandRegistry, SubmitFunction } from './commands/types'
 import { research } from './commands/research'
 import { chat } from './commands/chat'
 import { plan } from './commands/plan'

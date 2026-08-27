@@ -1,8 +1,10 @@
+import { apiErrorResponse, readJsonBody, requireObject } from '@/lib/security/api'
+
 export async function POST(req: Request) {
-  // Simply return success - actual response is handled by the research command
-  return new Response(JSON.stringify({ success: true }), {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+  try {
+    requireObject(await readJsonBody<unknown>(req))
+    return Response.json({ success: true })
+  } catch (error) {
+    return apiErrorResponse(error)
+  }
 }

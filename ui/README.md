@@ -38,6 +38,10 @@ E2B_API_KEY="your-e2b-api-key"
 OPENAI_API_KEY="your-openai-key"
 ANTHROPIC_API_KEY="your-anthropic-key"
 
+# Required for any server-funded API route unless Supabase auth is configured.
+# Generate at least 32 random bytes, for example: openssl rand -hex 32
+SPARC_API_AUTH_TOKEN="64-lowercase-hex-characters"
+
 # Additional Provider Options
 GROQ_API_KEY="your-groq-key"
 FIREWORKS_API_KEY="your-fireworks-key"
@@ -60,15 +64,22 @@ NEXT_PUBLIC_NO_BASE_URL_INPUT="true"
 
 # Rate Limiting
 RATE_LIMIT_MAX_REQUESTS="100"
-RATE_LIMIT_WINDOW="60"
+RATE_LIMIT_WINDOW="1h"
+
+# Request bodies are bounded to 256 KiB; the default is 64 KiB.
+SPARC_API_MAX_BODY_BYTES="65536"
 
 # Vercel/Upstash KV (for short URLs and rate limiting)
 KV_REST_API_URL="your-kv-api-url"
 KV_REST_API_TOKEN="your-kv-api-token"
 
-# Supabase Authentication
-SUPABASE_URL="your-supabase-url"
-SUPABASE_ANON_KEY="your-supabase-anon-key"
+# Supabase Authentication (alternative to SPARC_API_AUTH_TOKEN)
+NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+
+# Optional comma-separated origins for client-funded custom model endpoints.
+# Never add an origin that should receive server-owned provider credentials.
+MODEL_BASE_URL_ALLOWLIST="https://gateway.example.com"
 
 # PostHog Analytics
 NEXT_PUBLIC_POSTHOG_KEY="your-posthog-key"

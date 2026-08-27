@@ -6,26 +6,120 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  node:
+    name: Node ${{ matrix.node-version }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        node-version: [20, 22, 24]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Node ${{ matrix.node-version }}
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
 
-    - name: Install package and dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e ".[dev]" || pip install -e "." || (pip install --upgrade pip && pip install hatch && hatch env create)
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
 
-    - name: Run tests
-      run: |
-        pytest --tb=short || echo "No tests collected"
+      - name: Validate plugins
+        run: npm run validate:plugins
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test:coverage
+
+      - name: Build
+        run: npm run build
+
+      - name: Scan tracked and packed files for secrets
+        run: npm run scan:secrets
+
+      - name: Audit all dependencies
+        run: npm audit --audit-level=high
+
+      - name: Verify package contents
+        run: npm pack --dry-run --json --ignore-scripts > "$RUNNER_TEMP/npm-pack.json"
+
+  python:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          enable-cache: true
+
+      - name: Install locked package and test dependencies
+        run: uv sync --frozen --extra dev --python "${{ matrix.python-version }}"
+
+      - name: Run Python tests
+        run: uv run --frozen --extra dev python -m pytest --tb=short -q
+
+      - name: Audit locked Python environment
+        # uv-managed virtual environments intentionally omit pip unless it is
+        # requested. pip-audit needs pip's installed-distribution interface.
+        run: uv run --with pip --frozen --extra dev pip-audit
+
+  ui:
+    name: UI security and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    defaults:
+      run:
+        working-directory: ui
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Install locked UI dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Typecheck UI
+        run: npm run typecheck
+
+      - name: Test UI security boundary
+        run: npm run test:security
+
+      - name: Build UI
+        run: npm run build
+
+      - name: Audit all UI dependencies
+        run: npm audit --audit-level=high

@@ -2,11 +2,15 @@
 
 ## Supported Versions
 
-Provide a table or list of supported versions of your project and their respective end-of-life dates.
+Security fixes are provided for the latest release on `main`. Older releases are not supported unless a maintainer explicitly designates a maintenance branch.
 
 ## Reporting a Vulnerability
 
-Please report security vulnerabilities by emailing [your.email@example.com](mailto:your.email@example.com). All reports will be handled promptly and responsibly.
+Do not open a public issue for a suspected vulnerability. Submit a private report through [GitHub Security Advisories](https://github.com/ruvnet/SPARC/security/advisories/new).
+
+Include the affected version or commit, impact, reproduction steps, and any proposed mitigation. Do not include live credentials or unrelated personal data. Maintainers will acknowledge the report through the private advisory and coordinate disclosure after a fix is available.
+
+If a credential appears in the repository, revoke or rotate it immediately. Removing a file from the current branch does not remove the credential from Git history.
 
 ## Acknowledgements
 

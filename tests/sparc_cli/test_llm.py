@@ -49,7 +49,7 @@ def test_initialize_expert_llm():
         except Exception as e:
             pytest.fail(f"Failed to initialize expert LLM: {e}")
 
-def test_environment_variables():
+def test_environment_variables(monkeypatch):
     """Test environment variable precedence and fallback."""
     from sparc_cli.env import validate_environment
     from dataclasses import dataclass
@@ -59,7 +59,9 @@ def test_environment_variables():
         provider: str
         expert_provider: str
 
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    monkeypatch.delenv("EXPERT_OPENAI_API_KEY", raising=False)
     args = Args(provider='anthropic', expert_provider='openai')
     expert_enabled, missing = validate_environment(args)
-    assert isinstance(expert_enabled, bool)
-    assert isinstance(missing, list)
+    assert expert_enabled is False
+    assert missing == ["EXPERT_OPENAI_API_KEY environment variable is not set"]

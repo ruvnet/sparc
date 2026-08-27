@@ -1,0 +1,5 @@
+{
+  "runId": "example-run",
+  "goal": "Deliver one testable change through all five SPARC phases",
+  "principalId": "local-user"
+}

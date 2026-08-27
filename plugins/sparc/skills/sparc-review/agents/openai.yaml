@@ -1,0 +1,12 @@
+interface:
+  display_name: "SPARC Review"
+  short_description: "Audit SPARC gates, evidence, and trace"
+  default_prompt: "Use $sparc-review to audit this run without changing its state."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sparc"
+      description: "Deterministic SPARC run state, gates, evidence, and trace"
+      transport: "stdio"
+policy:
+  allow_implicit_invocation: true

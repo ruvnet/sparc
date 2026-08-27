@@ -1,4 +1,5 @@
 import { CommandHandler } from './types'
+import { commandErrorMessage } from './error'
 
 const HELP_CONTENT = `
 SPARC Methodology Overview:
@@ -81,7 +82,7 @@ export const help: CommandHandler = async (args: string, submit, context) => {
     })
 
     return true
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Help error:', error)
     
     submit({
@@ -89,7 +90,7 @@ export const help: CommandHandler = async (args: string, submit, context) => {
         role: 'assistant',
         content: [{ 
           type: 'text', 
-          text: `Unable to display help. Error: ${error?.message || 'An unexpected error occurred'}`
+          text: `Unable to display help. Error: ${commandErrorMessage(error)}`
         }]
       }],
       userID: context.userID,

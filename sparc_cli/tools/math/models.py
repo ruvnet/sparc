@@ -1,54 +1,66 @@
-from typing import Any, Dict
-from dataclasses import dataclass
+"""Validated data contracts for math benchmark evaluation."""
 
-@dataclass
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass, field
+from typing import Any, Literal
+
+ExpectedType = Literal["numerical", "symbolic", "matrix"]
+
+
+@dataclass(frozen=True)
 class BenchmarkRequest:
-    """A request to evaluate a math benchmark problem.
-    
-    Attributes:
-        problem_id: Unique identifier for the problem
-        problem_text: The actual problem text/statement
-        expected_type: Type of answer expected (numerical/symbolic/matrix)
-        metadata: Additional metadata about the problem
-    """
+    """A bounded request to evaluate one math benchmark problem."""
+
     problem_id: str
     problem_text: str
-    expected_type: str
-    metadata: Dict[str, Any]
+    expected_type: ExpectedType
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert the request to a dictionary representation.
-        
-        Returns:
-            Dictionary containing all fields of the request
-        """
-        return {
-            'problem_id': self.problem_id,
-            'problem_text': self.problem_text,
-            'expected_type': self.expected_type,
-            'metadata': self.metadata
-        }
+    def __post_init__(self) -> None:
+        if not isinstance(self.problem_id, str) or not self.problem_id.strip():
+            raise ValueError("problem_id must be a non-empty string")
+        if len(self.problem_id) > 128:
+            raise ValueError("problem_id exceeds 128 characters")
+        if not isinstance(self.problem_text, str) or not self.problem_text.strip():
+            raise ValueError("problem_text must be a non-empty string")
+        if len(self.problem_text) > 2_048:
+            raise ValueError("problem_text exceeds 2,048 characters")
+        if self.expected_type not in {"numerical", "symbolic", "matrix"}:
+            raise ValueError("expected_type must be numerical, symbolic, or matrix")
+        if not isinstance(self.metadata, dict):
+            raise ValueError("metadata must be a dictionary")
 
-@dataclass 
+    def to_dict(self) -> dict[str, Any]:
+        """Return a detached dictionary representation."""
+
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class BenchmarkResponse:
-    """Response containing the answer and validation results for a benchmark problem.
-    
-    Attributes:
-        problem_id: ID of the problem this response is for
-        answer: The computed answer (can be numerical, symbolic expression, or matrix)
-        validation_result: Dictionary containing validation details
-        metadata: Additional metadata about the response
-    """
+    """The answer, validation result, and evaluator metadata for a request."""
+
     problem_id: str
     answer: Any
-    validation_result: Dict[str, Any]
-    metadata: Dict[str, Any]
+    validation_result: dict[str, Any]
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.problem_id, str) or not self.problem_id.strip():
+            raise ValueError("problem_id must be a non-empty string")
+        if not isinstance(self.validation_result, dict):
+            raise ValueError("validation_result must be a dictionary")
+        if not isinstance(self.metadata, dict):
+            raise ValueError("metadata must be a dictionary")
 
     @property
     def is_valid(self) -> bool:
-        """Check if the response passed validation.
-        
-        Returns:
-            True if validation passed, False otherwise
-        """
-        return self.validation_result.get('valid', False)
+        """Return whether validation explicitly passed."""
+
+        return self.validation_result.get("valid") is True
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a detached dictionary representation."""
+
+        return asdict(self)

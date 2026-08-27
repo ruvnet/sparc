@@ -1,0 +1,15 @@
+{
+  "name": "ruvnet-sparc",
+  "description": "Evidence-gated SPARC delivery for Claude Code and Codex.",
+  "owner": {
+    "name": "ruvnet",
+    "url": "https://github.com/ruvnet"
+  },
+  "plugins": [
+    {
+      "name": "sparc",
+      "source": "./plugins/sparc",
+      "description": "Run Specification, Pseudocode, Architecture, Refinement, and Completion as a deterministic, resumable workflow with immutable evidence and traceable phase gates."
+    }
+  ]
+}

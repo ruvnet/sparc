@@ -1,5 +1,6 @@
 from typing import Dict, List, Any, Union, Optional, Set
 from typing_extensions import TypedDict
+from pydantic import StrictInt
 
 class WorkLogEntry(TypedDict):
     timestamp: str
@@ -33,6 +34,12 @@ class MemoryPriority:
     MEDIUM = 1
     HIGH = 2
     CRITICAL = 3
+
+
+def _normalize_priority(priority: int) -> int:
+    if isinstance(priority, bool) or not isinstance(priority, int):
+        raise ValueError("priority must be an integer from 0 to 3")
+    return min(max(priority, MemoryPriority.LOW), MemoryPriority.CRITICAL)
 
 class MemoryItem(TypedDict):
     """Base type for memory items with priority"""
@@ -88,6 +95,19 @@ def _enforce_memory_limit(memory_type: str) -> None:
             # Remove oldest, lowest priority items
             _global_memory['research_notes'] = notes[-limit:]
             
+    elif memory_type == 'plans':
+        plans = _global_memory['plans']
+        if len(plans) > limit:
+            _global_memory['plans'] = plans[-limit:]
+
+    elif memory_type == 'tasks':
+        tasks = _global_memory['tasks']
+        if len(tasks) > limit:
+            newest_ids = sorted(tasks)[-limit:]
+            _global_memory['tasks'] = {
+                task_id: tasks[task_id] for task_id in newest_ids
+            }
+
     elif memory_type in ['key_facts', 'key_snippets']:
         items = _global_memory[memory_type]
         if len(items) > limit:
@@ -107,7 +127,7 @@ def _enforce_memory_limit(memory_type: str) -> None:
             _global_memory['work_log'] = log[-limit:]
 
 @tool("emit_research_notes")
-def emit_research_notes(notes: str, priority: int = MemoryPriority.MEDIUM) -> str:
+def emit_research_notes(notes: str, priority: StrictInt = MemoryPriority.MEDIUM) -> str:
     """Store research notes in global memory with priority.
     
     Args:
@@ -119,9 +139,10 @@ def emit_research_notes(notes: str, priority: int = MemoryPriority.MEDIUM) -> st
     """
     from datetime import datetime
     
+    priority = _normalize_priority(priority)
     note = PrioritizedNote(
         content=notes,
-        priority=min(max(priority, MemoryPriority.LOW), MemoryPriority.CRITICAL),
+        priority=priority,
         timestamp=datetime.now().isoformat()
     )
     
@@ -152,6 +173,7 @@ def emit_plan(plan: str) -> str:
         The stored plan
     """
     _global_memory['plans'].append(plan)
+    _enforce_memory_limit('plans')
     console.print(Panel(Markdown(plan), title="📋 Plan"))
     log_work_event(f"Added plan step:\n\n{plan}")
     return plan
@@ -172,6 +194,7 @@ def emit_task(task: str) -> str:
     
     # Store task with ID
     _global_memory['tasks'][task_id] = task
+    _enforce_memory_limit('tasks')
     
     console.print(Panel(Markdown(task), title=f"✅ Task #{task_id}"))
     log_work_event(f"Task #{task_id} added:\n\n{task}")
@@ -180,7 +203,7 @@ def emit_task(task: str) -> str:
 
 
 @tool("emit_key_facts")
-def emit_key_facts(facts: List[str], priority: int = MemoryPriority.MEDIUM) -> str:
+def emit_key_facts(facts: List[str], priority: StrictInt = MemoryPriority.MEDIUM) -> str:
     """Store multiple key facts about the project or current task in global memory.
     
     Args:
@@ -193,7 +216,7 @@ def emit_key_facts(facts: List[str], priority: int = MemoryPriority.MEDIUM) -> s
     from datetime import datetime
     
     results = []
-    priority = min(max(priority, MemoryPriority.LOW), MemoryPriority.CRITICAL)
+    priority = _normalize_priority(priority)
     
     for fact in facts:
         # Get and increment fact ID
@@ -298,7 +321,7 @@ def request_implementation() -> str:
 
 
 @tool("emit_key_snippets")
-def emit_key_snippets(snippets: List[SnippetInfo], priority: int = MemoryPriority.MEDIUM) -> str:
+def emit_key_snippets(snippets: List[SnippetInfo], priority: StrictInt = MemoryPriority.MEDIUM) -> str:
     """Store multiple key source code snippets in global memory.
     Automatically adds the filepaths of the snippets to related files.
     
@@ -315,7 +338,7 @@ def emit_key_snippets(snippets: List[SnippetInfo], priority: int = MemoryPriorit
     """
     from datetime import datetime
     
-    priority = min(max(priority, MemoryPriority.LOW), MemoryPriority.CRITICAL)
+    priority = _normalize_priority(priority)
     # First collect unique filepaths to add as related files
     emit_related_files.invoke({"files": [snippet_info['filepath'] for snippet_info in snippets]})
 

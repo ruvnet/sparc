@@ -23,8 +23,8 @@ export type Message = {
   content: MessageContent[]
   loading?: boolean
   streaming?: boolean
-  object?: any
-  result?: any
+  object?: DeepPartial<FragmentSchema>
+  result?: ExecutionResult
 }
 
 export function toAISDKMessages(messages: Message[]) {
@@ -63,3 +63,7 @@ export function toMessageImage(image: string | File | File[]): MessageImage[] {
     image: URL.createObjectURL(image)
   }]
 }
+import type { DeepPartial } from 'ai'
+
+import type { FragmentSchema } from './schema'
+import type { ExecutionResult } from './types'

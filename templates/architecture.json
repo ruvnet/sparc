@@ -1,0 +1,51 @@
+{
+  "components": [
+    {
+      "name": "Component name",
+      "responsibility": "Single owned responsibility"
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "Interface name",
+      "contract": "Inputs, outputs, and errors"
+    }
+  ],
+  "ownership": [
+    {
+      "component": "Component name",
+      "owner": "Owning boundary"
+    }
+  ],
+  "trustBoundaries": [
+    {
+      "boundary": "Boundary name",
+      "control": "Authentication, authorization, and validation"
+    }
+  ],
+  "dataLifecycle": ["Creation, storage, retention, and deletion"],
+  "deploymentModel": ["Runtime and network placement"],
+  "observability": ["Metrics, logs, traces, and alerts"],
+  "migrationPath": ["Backward compatible rollout steps"],
+  "rollbackPath": ["Bounded recovery steps"],
+  "selectedDesign": ["Chosen design and decisive evidence"],
+  "alternatives": [
+    {
+      "name": "Alternative design",
+      "rejectedBecause": "Evidence based rejection reason",
+      "tradeoffs": {
+        "deliveryCost": "Comparison",
+        "runtimeCost": "Comparison",
+        "latency": "Comparison",
+        "accuracy": "Comparison",
+        "security": "Comparison",
+        "operationalRisk": "Comparison"
+      }
+    }
+  ],
+  "requirementCoverage": [
+    {
+      "requirementId": "REQ-1"
+    }
+  ]
+}

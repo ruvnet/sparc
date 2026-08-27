@@ -1,0 +1,49 @@
+{
+  "controlFlow": ["Describe the ordered success path"],
+  "stateTransitions": [
+    {
+      "from": "Current state",
+      "event": "Validated event",
+      "to": "Next state",
+      "onFailure": "Stable rejected state and error"
+    }
+  ],
+  "dataTransformations": ["Describe validation and transformation"],
+  "failurePaths": [
+    {
+      "condition": "Failure condition",
+      "error": "Stable error classification",
+      "stateEffect": "No partial state change"
+    }
+  ],
+  "retries": [
+    {
+      "condition": "Transient failure or no-retry condition",
+      "maxAttempts": 0,
+      "backoff": "Bounded schedule or none",
+      "exhaustion": "Final observable outcome"
+    }
+  ],
+  "idempotencyRules": [
+    {
+      "scope": "Mutation boundary",
+      "keyBinding": "Exact canonical request",
+      "replay": "Return the original result",
+      "mismatch": "Reject key reuse with changed input"
+    }
+  ],
+  "invariants": ["State a property that always holds"],
+  "walkthroughs": {
+    "success": ["Walk through one complete successful request"],
+    "failure": ["Walk through one complete rejected request"],
+    "invariantChecks": {
+      "success": ["State a property that always holds"],
+      "failure": ["State a property that always holds"]
+    }
+  },
+  "requirementCoverage": [
+    {
+      "requirementId": "REQ-1"
+    }
+  ]
+}

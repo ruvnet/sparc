@@ -5,14 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.0.0] - 2026-08-27
+
+### Added
+
+- Deterministic Specification, Pseudocode, Architecture, Refinement, and Completion state machine.
+- Compare and set revisions, principal scoped idempotency, append only artifacts and evidence, and hash chained receipts.
+- Local stdio and remote Streamable HTTP MCP transports with eight capability specific tools.
+- Exact version Claude and ChatGPT or Codex plugin manifests and three shared SPARC skills.
+- Preflighted, digest-verified `npx` skill installation with identity rechecks and rollback for observed failures.
+- MetaHarness SDK, kernel, policy, receipt, Horizon checkpoint, and Flywheel promotion integration.
+- Phase artifact templates, threat model, architecture decision record, validation matrix, and deep review.
+- Archive-aware secret scanning with scan-wide nested-entry and expanded-byte budgets, plus fail-closed continuous integration.
+
+### Security
+
+- Removed the credential bearing `ui.zip` archive from the current branch.
+- Replaced shell command reconstruction in the legacy interactive runner with argument preserving execution.
+- Replaced untrusted `sympy.sympify` entry points with an allowlisted mathematical parser.
+- Restricted server funded UI provider routes to authenticated, bounded, allowlisted requests.
+
 ## [0.87.7] - 2024-03-19
 
 - Add automatic playwright installation during package setup
 - Do not put file ID in file paths when reading for expert context.
 - Agents log work internally, improving context information.
 - Clear task list when plan is completed.
-
-## [Unreleased]
 
 ## [0.8.2] - 2024-12-23
 

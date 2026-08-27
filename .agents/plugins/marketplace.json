@@ -1,0 +1,20 @@
+{
+  "name": "ruvnet-sparc",
+  "interface": {
+    "displayName": "SPARC by ruvnet"
+  },
+  "plugins": [
+    {
+      "name": "sparc",
+      "source": {
+        "source": "local",
+        "path": "./plugins/sparc"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

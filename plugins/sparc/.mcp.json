@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "sparc": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "@ruvnet/sparc@1.0.0",
+        "mcp",
+        "stdio"
+      ]
+    }
+  }
+}

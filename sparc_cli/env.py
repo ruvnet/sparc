@@ -40,6 +40,11 @@ def validate_environment(args) -> Tuple[bool, List[str]]:
     provider = args.provider
     expert_provider = args.expert_provider
 
+    if provider not in PROVIDER_CONFIGS:
+        raise ValueError(f"Unsupported provider: {provider}")
+    if expert_provider not in PROVIDER_CONFIGS:
+        raise ValueError(f"Unsupported expert provider: {expert_provider}")
+
     # Check API keys based on provider configs
     if provider in PROVIDER_CONFIGS:
         config = PROVIDER_CONFIGS[provider]

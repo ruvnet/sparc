@@ -1,18 +1,13 @@
-# This is a comment
-# Each line is a file pattern followed by one or more owners.
+# Default ownership
+* @ruvnet
 
-# Owners for all files
-* @yourusername
-
-# Owners for documentation
-/docs/ @docsteam
-
-# Owners for frontend code
-/src/frontend/ @frontendteam
-
-# Owners for backend code
-/src/backend/ @backendteam
-
-# Specific file type
-*.js @javascriptowner
-*.py @pythonowner
+# Security and release boundaries
+/.github/ @ruvnet
+/CODEOWNERS @ruvnet
+/SECURITY.md @ruvnet
+/package.json @ruvnet
+/package-lock.json @ruvnet
+/pyproject.toml @ruvnet
+/plugins/ @ruvnet
+/scripts/scan-secrets.mjs @ruvnet
+/scripts/validate-plugins.mjs @ruvnet

@@ -1,40 +1,71 @@
-import { StreamingTextResponse, Message } from 'ai'
-import { NextResponse } from 'next/server'
+import { StreamingTextResponse } from 'ai'
 import { ChatAnthropic } from '@langchain/anthropic'
-import { HumanMessage, SystemMessage } from '@langchain/core/messages'
-import { AIMessage } from '@langchain/core/messages'
-import { MessageContentText } from '@langchain/core/messages'
+import {
+  AIMessage,
+  HumanMessage,
+  MessageContentText,
+  SystemMessage,
+} from '@langchain/core/messages'
+
+import { allowedAnthropicModel } from '@/lib/models'
+import {
+  ApiError,
+  apiErrorResponse,
+  enforceApiQuota,
+  optionalClientApiKey,
+  readJsonBody,
+  requestPrincipal,
+  requireObject,
+  requireServerCredential,
+} from '@/lib/security/api'
+
+function messageText(content: unknown) {
+  if (typeof content === 'string') return content
+  if (!Array.isArray(content)) {
+    throw new ApiError(400, 'invalid_messages', 'Message content is invalid.')
+  }
+
+  return content
+    .map((part) => {
+      const entry = requireObject(part, 'message content')
+      return entry.type === 'text' && typeof entry.text === 'string'
+        ? entry.text
+        : ''
+    })
+    .join('')
+}
+
+function parseMessages(value: unknown) {
+  if (!Array.isArray(value) || value.length === 0 || value.length > 128) {
+    throw new ApiError(400, 'invalid_messages', 'Messages are invalid.')
+  }
+
+  return value.map((item) => {
+    const message = requireObject(item, 'message')
+    const content = messageText(message.content)
+    if (message.role === 'system') return new SystemMessage(content)
+    if (message.role === 'assistant') return new AIMessage(content)
+    if (message.role === 'user') return new HumanMessage(content)
+    throw new ApiError(400, 'invalid_messages', 'Message role is invalid.')
+  })
+}
 
 export async function POST(req: Request) {
   try {
-    const { prompt, messages: previousMessages, modelName } = await req.json()
-    
+    const body = requireObject(await readJsonBody<unknown>(req))
+    const clientApiKey = optionalClientApiKey(body.apiKey)
+    const principal = await requestPrincipal(req, clientApiKey)
+    await enforceApiQuota(principal)
+
+    const apiKey =
+      clientApiKey ?? requireServerCredential(process.env.ANTHROPIC_API_KEY)
     const model = new ChatAnthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-      modelName: modelName || 'claude-3-sonnet-20240229',
-      streaming: true
+      apiKey,
+      modelName: allowedAnthropicModel(body.modelName),
+      streaming: true,
     })
 
-    // Convert previous messages to the format expected by the model
-    const messageHistory = previousMessages?.map((msg: any) => {
-      // Handle nested content structure
-      let messageText = ''
-      if (Array.isArray(msg.content)) {
-        const textContent = msg.content.find((c: any) => c.type === 'text')
-        messageText = textContent?.text || ''
-      } else {
-        messageText = msg.content || ''
-      }
-      
-      return msg.role === 'system'
-        ? new SystemMessage(messageText)
-        : new HumanMessage(messageText)
-    }) || []
-
-    // Use the full message history
-    const messages = messageHistory
-
-    const stream = await model.stream(messages);
+    const stream = await model.stream(parseMessages(body.messages))
     
     // Transform the stream to emit text chunks
     const textEncoder = new TextEncoder()
@@ -42,9 +73,8 @@ export async function POST(req: Request) {
       async start(controller) {
         try {
           for await (const chunk of stream) {
-            // Handle both string and complex message content
             let content = ''
-            
+
             if (chunk instanceof AIMessage) {
               if (typeof chunk.content === 'string') {
                 content = chunk.content
@@ -75,10 +105,7 @@ export async function POST(req: Request) {
       }
     })
     
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    )
+  } catch (error) {
+    return apiErrorResponse(error)
   }
 }

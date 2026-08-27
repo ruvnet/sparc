@@ -1,27 +1,45 @@
-"""Tests for the PolarisOne tool."""
+from unittest.mock import Mock, patch
 
 import pytest
+
 from sparc_cli.tools.polaris import PolarisTool
 
-def test_polaris_tool():
-    """Test that the PolarisOne tool correctly processes text."""
-    tool = PolarisTool()
-    
-    # Test basic query
+
+class StubPolarisModel:
+    def generate_with_weights(self, messages):
+        assert messages[0].content == "What is the capital of France?"
+        return "Paris", [("capital", 0.8), ("France", 1.0)]
+
+
+def test_polaris_tool_supports_offline_dependency_injection():
+    tool = PolarisTool(polaris_model=StubPolarisModel())
+
     result = tool("What is the capital of France?")
-    
-    # Verify response structure
-    assert isinstance(result, dict)
-    assert "response" in result
-    assert "token_weights" in result
-    
-    # Verify token weights
-    token_weights = result["token_weights"]
-    assert isinstance(token_weights, list)
-    assert len(token_weights) > 0
-    
-    # Each token weight should be a (str, float) tuple
-    for token, weight in token_weights:
-        assert isinstance(token, str)
-        assert isinstance(weight, float)
-        assert 0 <= weight <= 1  # Weights should be between 0 and 1
+
+    assert result == {
+        "response": "Paris",
+        "token_weights": [("capital", 0.8), ("France", 1.0)],
+    }
+
+
+def test_polaris_tool_has_no_import_time_model_construction():
+    with patch("sparc_cli.tools.polaris.initialize_llm") as initialize:
+        model = Mock()
+        wrapper = Mock()
+        initialize.return_value = model
+        with patch("sparc_cli.tools.polaris.create_polaris_model", return_value=wrapper):
+            tool = PolarisTool(provider="anthropic", model_name="claude-test")
+
+    initialize.assert_called_once_with("anthropic", "claude-test")
+    assert tool.polaris_model is wrapper
+
+
+@pytest.mark.parametrize("text", ["", "   ", None])
+def test_polaris_tool_rejects_empty_input(text):
+    with pytest.raises(ValueError, match="non-empty"):
+        PolarisTool(polaris_model=StubPolarisModel())(text)
+
+
+def test_polaris_tool_rejects_ambiguous_model_injection():
+    with pytest.raises(ValueError, match="not both"):
+        PolarisTool(polaris_model=StubPolarisModel(), base_model=Mock())

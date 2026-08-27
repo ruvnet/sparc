@@ -1,150 +1,130 @@
-"""
-ReActMathAgent implementation for mathematical problem solving using LangChain.
+"""A small, modern LangChain math-agent pipeline.
 
-This module implements a ReAct (Reasoning + Acting) agent specifically designed
-for mathematical problem solving, using LangChain components and chain-of-thought
-methodology.
+The historical implementation inherited from an obsolete LangChain agent API
+and attempted to pass this class itself to ``AgentExecutor``. This version uses
+the stable ``langchain-core`` Runnable interface and invokes only tools supplied
+by the caller.
 """
 
-from typing import Any, List, Dict, Optional
-from langchain.agents import AgentExecutor
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
-from langchain.base_language import BaseLanguageModel
-from langchain.tools import BaseTool
+from __future__ import annotations
+
+from typing import Any, Mapping, Sequence
+
+from langchain_core.language_models import BaseLanguageModel
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+from langchain_core.tools import BaseTool
+
 
 class MathAgent:
-    """
-    A ReAct agent specialized for mathematical problem solving.
-    
-    Implements chain-of-thought reasoning and tool-based problem solving using
-    LangChain components.
-    """
-    
-    def __init__(self, llm: BaseLanguageModel, tools: List[BaseTool]):
-        """
-        Initialize the ReActMathAgent.
-        
-        Args:
-            llm: Language model to use for reasoning
-            tools: List of available mathematical tools
-        """
+    """Route a bounded math problem through analysis, selection, and execution."""
+
+    def __init__(
+        self,
+        llm: BaseLanguageModel,
+        tools: Sequence[BaseTool] | None = None,
+        config: Mapping[str, Any] | None = None,
+    ) -> None:
         self.llm = llm
-        self.tools = tools
+        self.tools = list(tools or ())
+        self.config = {
+            "max_problem_length": 2_048,
+            **dict(config or {}),
+        }
         self.setup_prompts()
         self.setup_chains()
-        
+
     def setup_prompts(self) -> None:
-        """Configure prompt templates for different reasoning stages."""
-        self.analysis_prompt = PromptTemplate(
-            input_variables=["problem"],
-            template="""Analyze this mathematical problem:
-            {problem}
-            
-            Break it down into steps and identify key components.
-            Thought process:"""
+        """Configure the three explicit stages used by the pipeline."""
+
+        self.analysis_prompt = PromptTemplate.from_template(
+            "Analyze the mathematical problem briefly and identify its type.\n"
+            "Problem: {problem}\nAnalysis:"
         )
-        
-        self.tool_selection_prompt = PromptTemplate(
-            input_variables=["analysis", "tools"],
-            template="""Based on this analysis:
-            {analysis}
-            
-            Available tools:
-            {tools}
-            
-            Which tool would be most appropriate? Why?
-            Reasoning:"""
+        self.tool_selection_prompt = PromptTemplate.from_template(
+            "Choose exactly one available tool name, or NONE.\n"
+            "Analysis: {analysis}\nAvailable tools:\n{tools}\nChoice:"
         )
-        
-        self.reasoning_prompt = PromptTemplate(
-            input_variables=["problem", "analysis", "tool_choice"],
-            template="""Problem: {problem}
-            Analysis: {analysis}
-            Selected tool: {tool_choice}
-            
-            Let's solve this step by step:
-            1)"""
+        self.reasoning_prompt = PromptTemplate.from_template(
+            "Return a concise final answer to this math problem.\n"
+            "Problem: {problem}\nAnalysis: {analysis}\n"
+            "Selected tool: {tool_choice}\nAnswer:"
         )
-        
+
     def setup_chains(self) -> None:
-        """Configure LangChain components and execution chains."""
-        self.analysis_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.analysis_prompt
-        )
-        
-        self.tool_selection_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.tool_selection_prompt
-        )
-        
-        self.reasoning_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.reasoning_prompt
-        )
-        
-        self.agent_executor = AgentExecutor.from_agent_and_tools(
-            agent=self,
-            tools=self.tools,
-            verbose=True,
-            handle_parsing_errors=True
-        )
-        
-    def run(self, problem: str) -> Dict[str, Any]:
-        """
-        Execute the mathematical problem solving process.
-        
-        Args:
-            problem: Mathematical problem to solve
-            
-        Returns:
-            Dict containing:
-                - solution: Final answer
-                - steps: List of intermediate reasoning steps
-                - tools_used: List of tools utilized
-                - confidence: Confidence score in the solution
-        """
+        """Build LCEL chains supported by current ``langchain-core`` releases."""
+
+        text = StrOutputParser()
+        self.analysis_chain = self.analysis_prompt | self.llm | text
+        self.tool_selection_chain = self.tool_selection_prompt | self.llm | text
+        self.reasoning_chain = self.reasoning_prompt | self.llm | text
+        # Stable public alias for callers that previously inspected the chain.
+        self.agent_chain = self.reasoning_chain
+
+    def run(self, problem: str) -> dict[str, Any]:
+        """Solve ``problem`` and return an auditable, bounded stage summary."""
+
+        if not isinstance(problem, str) or not problem.strip():
+            raise ValueError("problem must be a non-empty string")
+        maximum = self.config.get("max_problem_length", 2_048)
+        if isinstance(maximum, bool) or not isinstance(maximum, int) or maximum < 1:
+            raise ValueError("max_problem_length must be a positive integer")
+        if len(problem) > maximum:
+            raise ValueError(f"problem exceeds {maximum} characters")
+
+        steps: list[dict[str, str]] = []
         try:
-            # Track intermediate steps
-            steps = []
-            
-            # Problem analysis
-            analysis = self.analysis_chain.run(problem=problem)
+            analysis = self.analysis_chain.invoke({"problem": problem})
             steps.append({"stage": "analysis", "output": analysis})
-            
-            # Tool selection
-            tool_selection = self.tool_selection_chain.run(
-                analysis=analysis,
-                tools="\n".join([t.name + ": " + t.description for t in self.tools])
-            )
-            steps.append({"stage": "tool_selection", "output": tool_selection})
-            
-            # Reasoning and solution
-            reasoning = self.reasoning_chain.run(
-                problem=problem,
-                analysis=analysis,
-                tool_choice=tool_selection
-            )
-            steps.append({"stage": "reasoning", "output": reasoning})
-            
-            # Execute solution using selected tool
-            result = self.agent_executor.run(
-                input=reasoning,
-                intermediate_steps=steps
-            )
-            
+
+            tool_descriptions = "\n".join(
+                f"{tool.name}: {tool.description}" for tool in self.tools
+            ) or "NONE"
+            selection = self.tool_selection_chain.invoke(
+                {"analysis": analysis, "tools": tool_descriptions}
+            ).strip()
+            steps.append({"stage": "tool_selection", "output": selection})
+
+            selected = self._select_tool(selection)
+            if selected is not None:
+                solution = selected.invoke(problem)
+                tool_names = [selected.name]
+                confidence = 1.0
+            else:
+                solution = self.reasoning_chain.invoke(
+                    {
+                        "problem": problem,
+                        "analysis": analysis,
+                        "tool_choice": "NONE",
+                    }
+                )
+                tool_names = []
+                confidence = 0.5
+            steps.append({"stage": "solution", "output": str(solution)})
+
             return {
-                "solution": result,
+                "solution": solution,
                 "steps": steps,
-                "tools_used": self.agent_executor.tools_used,
-                "confidence": self.agent_executor.confidence
+                "tools_used": tool_names,
+                "confidence": confidence,
             }
-            
-        except Exception as e:
+        except Exception as exc:
             return {
-                "error": str(e),
+                "error": str(exc),
                 "steps": steps,
                 "tools_used": [],
-                "confidence": 0.0
+                "confidence": 0.0,
             }
+
+    def _select_tool(self, selection: str) -> BaseTool | None:
+        """Resolve a model selection without allowing arbitrary tool names."""
+
+        normalized = selection.strip().strip("`").casefold()
+        matches = [tool for tool in self.tools if tool.name.casefold() == normalized]
+        return matches[0] if len(matches) == 1 else None
+
+
+# Compatibility name used by the original design document.
+ReActMathAgent = MathAgent
+
+__all__ = ["MathAgent", "ReActMathAgent"]

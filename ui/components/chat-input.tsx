@@ -6,7 +6,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { ArrowUp, Paperclip, Square, X } from 'lucide-react'
-import { SetStateAction, useMemo } from 'react'
+import Image from 'next/image'
+import { SetStateAction, useEffect, useMemo } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
 
 export function ChatInput({
@@ -40,30 +41,45 @@ export function ChatInput({
     handleFileChange((prev) => [...prev, ...Array.from(e.target.files || [])])
   }
 
-  function handleFileRemove(file: File) {
-    handleFileChange((prev) => prev.filter((f) => f !== file))
-  }
+  const filePreviews = useMemo(
+    () => files.map((file) => ({ file, url: URL.createObjectURL(file) })),
+    [files],
+  )
+
+  useEffect(
+    () => () => {
+      filePreviews.forEach(({ url }) => URL.revokeObjectURL(url))
+    },
+    [filePreviews],
+  )
 
   const filePreview = useMemo(() => {
-    if (files.length === 0) return null
-    return Array.from(files).map((file) => {
+    if (filePreviews.length === 0) return null
+    return filePreviews.map(({ file, url }) => {
       return (
-        <div className="relative" key={file.name}>
+        <div className="relative" key={`${file.name}-${file.lastModified}`}>
           <span
-            onClick={() => handleFileRemove(file)}
+            onClick={() =>
+              handleFileChange((previous) =>
+                previous.filter((candidate) => candidate !== file),
+              )
+            }
             className="absolute top-[-8] right-[-8] bg-muted rounded-full p-1"
           >
             <X className="h-3 w-3 cursor-pointer" />
           </span>
-          <img
-            src={URL.createObjectURL(file)}
+          <Image
+            src={url}
             alt={file.name}
+            width={40}
+            height={40}
+            unoptimized
             className="rounded-xl w-10 h-10 object-cover"
           />
         </div>
       )
     })
-  }, [files])
+  }, [filePreviews, handleFileChange])
 
   function onEnter(e: React.KeyboardEvent<HTMLFormElement>) {
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
