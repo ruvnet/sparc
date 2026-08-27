@@ -1,4 +1,4 @@
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -74,6 +74,20 @@ describe('npx CLI', () => {
         requiredAction: expect.stringContaining('explicitly register'),
       },
     });
+  });
+
+  it('packages a ChatGPT plugin only from a registered application identifier', async () => {
+    const root = await temporaryRoot();
+    const output = capture();
+    await expect(runCli([
+      'plugin', 'chatgpt', 'package',
+      '--app-id', 'plugin_asdk_app_0123456789abcdef', '--target', root,
+    ], output.io)).resolves.toBe(0);
+    expect(JSON.parse(output.stdout.join(''))).toMatchObject({
+      ok: true,
+      plugin: { appId: 'plugin_asdk_app_0123456789abcdef', pluginName: 'sparc' },
+    });
+    await expect(readFile(join(root, 'sparc', '.app.json'), 'utf8')).resolves.toContain('plugin_asdk_app_');
   });
 
   it('returns bounded run summaries and revision-bound trace pages', async () => {

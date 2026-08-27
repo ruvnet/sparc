@@ -75,7 +75,7 @@ Local clients use MCP over standard input and output. The HTTP mode uses Streama
 
 The npm skill installer preflights every selected host and skill, verifies staged digests, removes staging after observed copy failures, and restores backups after observed commit failures. Existing destinations require explicit `--force`, and symbolic-link traversal is rejected. This is a transactional process boundary; the six possible destination renames are not crash-atomic as one unit.
 
-The repository does not contain a fabricated `.app.json`. ChatGPT creates the application identifier only after a deployed HTTPS MCP endpoint is registered in developer mode.
+The source plugin does not contain a fabricated `.app.json`. ChatGPT creates the application identifier only after a deployed HTTPS MCP endpoint is registered in developer mode. A separate `plugin chatgpt package` command validates the returned identifier and produces the remote-app variant without changing the source plugin.
 
 ## Security properties
 

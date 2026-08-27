@@ -47,6 +47,7 @@ SPARC records and validates development lifecycle evidence. It does not execute 
 | OAuth discovery ambiguity | The challenge advertises the RFC 9728 path-derived URI; a root compatibility endpoint returns the same resource metadata | Path-bearing advertisement and equivalent fallback tests |
 | Secret inclusion | Tracked file and archive aware scanning plus explicit npm file allowlist | Canary and package scan tests |
 | Partial dual-host skill install | Preflight and verified staging across all destinations, staging cleanup on observed copy failure, backup restoration on observed commit failure, and symbolic-link rejection | Existing-destination and rollback tests |
+| ChatGPT plugin path substitution | Registered-ID validation, isolated staging, no-follow synchronized writes, symbolic-link rejection, and explicit replacement | Invalid-ID, existing-destination, force, generated-manifest, and symbolic-link tests |
 
 ## Authorization model
 
@@ -104,6 +105,8 @@ Genesis uniqueness relies on the operating system random source used for the 32-
 Pagination bounds each MCP or CLI trace response, not the total size of a complete audit. Clients must follow every snapshot-bound `nextCursor`, enforce their own total-work budget, and restart rather than combine pages if the run changes. `sparc_run_get` and CLI `status` intentionally return summaries, not collection contents. CLI `list` returns principal-bound pages of run summaries.
 
 The skill installer removes staging after an observed copy failure and restores backups after an observed commit failure. Its six possible destination renames are not crash-atomic as one unit. A process crash, filesystem failure, cleanup failure, or operator interruption outside that rollback path remains an operational recovery case.
+
+ChatGPT plugin packaging has the same portable-filesystem boundary: it rejects observed symbolic links and writes through no-follow file descriptors, but a process already authorized to rename target-tree directories can race path checks. Package only while the target tree is under exclusive trusted control. A crash after replacing an existing output can also leave the uniquely named backup for operator recovery.
 
 The MCP runtime bounds each request but does not provide a cross-request or cross-replica quota. Production deployments should enforce authenticated principal and tenant rate limits in shared proxy infrastructure.
 

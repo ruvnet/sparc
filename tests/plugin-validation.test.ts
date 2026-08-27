@@ -42,7 +42,7 @@ describe('plugin validator', () => {
 
     expect(failures).toContain('@latest is forbidden');
     expect(failures).toContain('legacy skill.toml is forbidden');
-    expect(failures).toContain('fabricated .app.json is forbidden');
+    expect(failures).toContain('committed .app.json is forbidden');
   });
 
   it('rejects shell launchers, generic tools, and mirror drift', () => {

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Registered-ID ChatGPT plugin packaging through `sparc plugin chatgpt package`, with isolated staging, no-follow synchronized writes, explicit replacement, and canonical plugin validation.
+
+### Security
+
+- Overrode the UI's vulnerable transitive `uuid` release with 11.1.1; the remaining AI SDK advisories require a separately tested breaking major migration.
+
 ## [1.0.0] - 2026-08-27
 
 ### Added

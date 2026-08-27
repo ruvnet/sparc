@@ -263,7 +263,15 @@ codex plugin marketplace add /absolute/path/to/SPARC
 codex plugin add sparc@ruvnet-sparc
 ```
 
-ChatGPT cannot reach a local stdio process. Deploy the Streamable HTTP endpoint over HTTPS, configure OAuth-compatible token verification and RFC 9728 discovery, and register `/mcp` in ChatGPT developer mode. ChatGPT creates the application identifier during registration, so this repository intentionally does not fabricate an `.app.json`.
+ChatGPT cannot reach a local stdio process. Deploy the Streamable HTTP endpoint over HTTPS, configure OAuth-compatible token verification and RFC 9728 discovery, and register `/mcp` in ChatGPT developer mode. ChatGPT creates a technical application identifier beginning with `plugin_asdk_app_` during registration. Use that exact value to produce the remote-app plugin variant:
+
+```sh
+npx --yes @ruvnet/sparc@1.0.0 plugin chatgpt package \
+  --app-id plugin_asdk_app_<registered-id> \
+  --target ./dist-plugins
+```
+
+The command creates `./dist-plugins/sparc/.app.json`, switches the generated Codex manifest from the local stdio server to the registered app, rejects guessed or malformed IDs, rejects symbolic-link target paths, and refuses to replace an existing output unless `--force` is explicit. The source plugin remains the Claude/local-Codex variant and intentionally contains no `.app.json`.
 
 See [`docs/PLUGIN_INSTALLATION.md`](./docs/PLUGIN_INSTALLATION.md) and [`docs/VALIDATION.md`](./docs/VALIDATION.md) for the host-specific gate.
 

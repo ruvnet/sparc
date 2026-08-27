@@ -25,6 +25,7 @@ import {
   summarizeSparcRun,
 } from './mcp/server.js';
 import { startSparcStdioServer } from './mcp/stdio.js';
+import { packageChatGptPlugin } from './plugin-package.js';
 import { installSkills, SPARC_MCP_PREREQUISITE, SPARC_SKILLS, type SkillHost } from './skills.js';
 import { SparcStore } from './store.js';
 
@@ -57,6 +58,7 @@ Usage:
   sparc trace --run-id ID [--cursor CURSOR] [--limit N] [common options]
   sparc skills list
   sparc skills install --host claude|codex|both [--target PATH] [--force]
+  sparc plugin chatgpt package --app-id ID [--target PATH] [--force]
   sparc promote --file FILE
   sparc doctor [common options]
   sparc mcp stdio [common options]
@@ -435,6 +437,26 @@ async function runMcp(args: readonly string[], io: CliIo): Promise<number> {
   throw new Error('mcp requires stdio or http');
 }
 
+async function runPlugin(args: readonly string[], io: CliIo): Promise<number> {
+  if (args[0] !== 'chatgpt' || args[1] !== 'package') {
+    throw new Error('plugin requires chatgpt package');
+  }
+  const values = parsed(args.slice(2), {
+    'app-id': { type: 'string' },
+    target: { type: 'string' },
+    force: { type: 'boolean', default: false },
+  });
+  writeJson(io, {
+    ok: true,
+    plugin: await packageChatGptPlugin({
+      appId: required(values, 'app-id'),
+      targetRoot: resolve(optionalString(values, 'target') ?? 'chatgpt-plugin'),
+      force: values.force === true,
+    }),
+  });
+  return 0;
+}
+
 export async function runCli(argv: readonly string[], io: CliIo = defaultIo): Promise<number> {
   const [command, ...args] = argv;
   if (!command || command === 'help' || command === '--help' || command === '-h') {
@@ -449,6 +471,7 @@ export async function runCli(argv: readonly string[], io: CliIo = defaultIo): Pr
   const stateResult = await runStateCommand(command, args, io);
   if (stateResult >= 0) return stateResult;
   if (command === 'skills') return runSkills(args, io);
+  if (command === 'plugin') return runPlugin(args, io);
   if (command === 'mcp') return runMcp(args, io);
   if (command === 'promote') {
     const values = parsed(args, { file: { type: 'string' } });

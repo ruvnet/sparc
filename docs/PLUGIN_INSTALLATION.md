@@ -60,7 +60,17 @@ export SPARC_MCP_RESOURCE=https://sparc.example.com/mcp
 
 RFC 9728 path-specific discovery for that resource is served and advertised at `https://sparc.example.com/.well-known/oauth-protected-resource/mcp`. The server also serves the same resource metadata at the root compatibility endpoint `https://sparc.example.com/.well-known/oauth-protected-resource`. Route both discovery paths and `/mcp` through the HTTPS proxy. If the configured resource has a deeper path, its canonical advertised metadata path appends that entire path after `/.well-known/oauth-protected-resource`.
 
-Do not create an `.app.json` by guessing an application identifier. ChatGPT produces the identifier during registration. A deployment is not production-ready until authentication, RFC 9728 discovery, principal isolation, scope enforcement, signed evidence, pagination, and the remote checks in [VALIDATION.md](./VALIDATION.md) pass. Repository tests cannot substitute for a live ChatGPT registration and production identity provider.
+Do not create an `.app.json` by guessing an application identifier. ChatGPT produces a technical identifier beginning with `plugin_asdk_app_` during registration. After registration, package the remote-app variant with the exact returned value:
+
+```sh
+npx --yes @ruvnet/sparc@1.0.0 plugin chatgpt package \
+  --app-id plugin_asdk_app_<registered-id> \
+  --target ./dist-plugins
+```
+
+This creates `./dist-plugins/sparc` without mutating the source plugin. Its `.app.json` maps the `sparc` app to the registered identifier, and its Codex manifest references that app instead of the local stdio MCP launcher. The output path must be a real directory path without symbolic links; generated files are opened without following links and synchronized before commit. An existing `sparc` output requires `--force`, with atomic backup and restoration around replacement. Node does not expose a portable directory-relative `openat` transaction, so run packaging with exclusive trusted control of the target tree; an already-privileged process able to rename directories concurrently remains a narrow check-to-operation race.
+
+A deployment is not production-ready until authentication, RFC 9728 discovery, principal isolation, scope enforcement, signed evidence, pagination, generated-plugin validation, and the remote checks in [VALIDATION.md](./VALIDATION.md) pass. Repository tests cannot substitute for a live ChatGPT registration and production identity provider.
 
 ## Available skills
 

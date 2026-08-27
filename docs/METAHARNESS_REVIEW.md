@@ -80,7 +80,7 @@ The MCP server is a capability adapter around that engine. It exposes eight SPAR
 
 Claude Code receives a local stdio server configuration. Local Codex can use the same transport. ChatGPT receives a remote Streamable HTTP configuration with bearer or OAuth compatible access token verification. Public ChatGPT installation requires deploying the endpoint over HTTPS and registering it in ChatGPT developer mode. A local stdio process is intentionally insufficient for that use case.
 
-The repository does not include a fabricated `.app.json`. ChatGPT creates that identifier only after MCP registration.
+The source plugin does not include a fabricated `.app.json`. ChatGPT creates that identifier only after MCP registration; the pinned npm CLI then packages a separate remote-app plugin from the exact returned identifier.
 
 ## Acceptance gate
 

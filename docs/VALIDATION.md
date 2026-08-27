@@ -91,10 +91,11 @@ Local stdio validation does not prove ChatGPT compatibility. Before claiming a h
 1. Serve the Streamable HTTP MCP endpoint behind HTTPS.
 2. Configure a real OAuth issuer, audience, JWKS URL, resource URL, and `sparc.read` and `sparc.write` scopes.
 3. If the resource is `https://sparc.example.com/mcp`, verify that `WWW-Authenticate` advertises `https://sparc.example.com/.well-known/oauth-protected-resource/mcp`, that an unauthenticated `GET` there returns matching RFC 9728 metadata, and that the root compatibility endpoint returns the same `resource` value.
-4. Register the endpoint in ChatGPT developer mode; keep the generated application identifier outside source control unless the registration workflow explicitly exports a safe manifest.
-5. Exercise initialization, confirm both run digests in the bounded summary, complete multipage trace traversal, one authorized mutation, stale-revision and stale-cursor rejection, and cross-principal denial from ChatGPT.
-6. Record a pass whose signature binds both digests with an independent verifier, then prove that unsigned, forged, and wrong-genesis passes are rejected.
-7. Retain only redacted protocol and receipt evidence.
+4. Register the endpoint in ChatGPT developer mode and capture the returned `plugin_asdk_app_...` technical identifier without committing it to the source plugin.
+5. Run `npx --yes @ruvnet/sparc@1.0.0 plugin chatgpt package --app-id <registered-id> --target <output>` and validate the generated plugin. Confirm its `.app.json` contains only the `sparc` identifier mapping and its Codex manifest references `./.app.json` instead of local stdio MCP.
+6. Exercise initialization, confirm both run digests in the bounded summary, complete multipage trace traversal, one authorized mutation, stale-revision and stale-cursor rejection, and cross-principal denial from ChatGPT.
+7. Record a pass whose signature binds both digests with an independent verifier, then prove that unsigned, forged, and wrong-genesis passes are rejected.
+8. Retain only redacted protocol and receipt evidence.
 
 ## Release evidence
 

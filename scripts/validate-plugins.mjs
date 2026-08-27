@@ -294,7 +294,9 @@ function validatePlugin(repositoryRoot, pluginRoot, failures, packageVersion) {
   for (const path of files) {
     const relativePath = toPosix(relative(pluginRoot, path));
     if (basename(path) === 'skill.toml') failures.push(`${relativePlugin}/${relativePath}: legacy skill.toml is forbidden`);
-    if (basename(path) === '.app.json') failures.push(`${relativePlugin}/${relativePath}: fabricated .app.json is forbidden`);
+    if (basename(path) === '.app.json') {
+      failures.push(`${relativePlugin}/${relativePath}: committed .app.json is forbidden; generate it from a registered ChatGPT app ID`);
+    }
     const text = readFileSync(path, 'utf8');
     if (/@latest\b/i.test(text)) failures.push(`${relativePlugin}/${relativePath}: @latest is forbidden`);
     if (/^(?:allowed-tools|allowed_tools)\s*:/im.test(text)) {
