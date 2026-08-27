@@ -1,4 +1,4 @@
-aider-chat>=0.82.0
+aider-chat>=0.86.2
 playwright>=1.49.0
 pytest-timeout>=2.2.0
 pytest>=7.0.0
