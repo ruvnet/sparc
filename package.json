@@ -59,7 +59,7 @@
     "@metaharness/sdk": "0.1.0",
     "@modelcontextprotocol/sdk": "1.30.0",
     "jose": "6.2.10",
-    "zod": "3.25.76"
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@types/node": "20.19.43",
