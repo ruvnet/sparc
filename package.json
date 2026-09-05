@@ -52,7 +52,7 @@
     "check": "npm run scan:secrets && npm run validate:plugins && npm run typecheck && npm run test:coverage && npm run build && npm run pack:check"
   },
   "dependencies": {
-    "@metaharness/flywheel": "0.1.10",
+    "@metaharness/flywheel": "0.1.11",
     "@metaharness/harness": "0.2.0",
     "@metaharness/horizon": "0.2.0",
     "@metaharness/kernel": "0.1.3",
