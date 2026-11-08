@@ -47,6 +47,7 @@ const CLIENT_KEY_PROVIDERS = new Set([
   'groq',
   'togetherai',
   'fireworks',
+  'runcrate',
   'xai',
 ])
 
@@ -58,6 +59,7 @@ const PROVIDER_ORIGINS: Record<string, string> = {
   groq: 'https://api.groq.com',
   togetherai: 'https://api.together.xyz',
   fireworks: 'https://api.fireworks.ai',
+  runcrate: 'https://api.runcrate.ai',
   xai: 'https://api.x.ai',
 }
 
@@ -214,6 +216,7 @@ export function assertServerProviderConfigured(model: LLMModel) {
     groq: process.env.GROQ_API_KEY,
     togetherai: process.env.TOGETHER_API_KEY,
     fireworks: process.env.FIREWORKS_API_KEY,
+    runcrate: process.env.RUNCRATE_API_KEY,
     vertex: process.env.GOOGLE_VERTEX_CREDENTIALS,
     xai: process.env.XAI_API_KEY,
   }
@@ -251,6 +254,11 @@ export function getModelClient(
       createOpenAI({
         apiKey: apiKey || process.env.TOGETHER_API_KEY,
         baseURL: baseURL || 'https://api.together.xyz/v1',
+      })(modelNameString),
+    runcrate: () =>
+      createOpenAI({
+        apiKey: apiKey || process.env.RUNCRATE_API_KEY,
+        baseURL: baseURL || 'https://api.runcrate.ai/v1',
       })(modelNameString),
     ollama: () => createOllama({ baseURL })(modelNameString),
     fireworks: () =>
