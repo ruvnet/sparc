@@ -10,6 +10,7 @@ import {
 } from '../lib/security/api'
 import {
   assertAllowedModel,
+  assertServerProviderConfigured,
   sanitizeModelConfig,
   type LLMModel,
 } from '../lib/models'
@@ -149,5 +150,27 @@ describe('model trust boundary', () => {
         baseURL: 'https://gateway.example.com/v1',
       }).baseURL,
     ).toBe('https://gateway.example.com/v1')
+  })
+
+  it('catalogs Runcrate and keeps its server credential locked to Runcrate', () => {
+    const runcrateModel: LLMModel = {
+      id: 'Qwen/Qwen3-235B-A22B-Instruct-2507',
+      name: 'Qwen3 235B A22B',
+      provider: 'Runcrate',
+      providerId: 'runcrate',
+    }
+    expect(() => assertAllowedModel(runcrateModel)).not.toThrow()
+
+    vi.stubEnv('RUNCRATE_API_KEY', '')
+    expect(() => assertServerProviderConfigured(runcrateModel)).toThrowError(
+      expect.objectContaining({ code: 'provider_not_configured' }),
+    )
+    vi.stubEnv('RUNCRATE_API_KEY', 'server-key')
+    expect(() => assertServerProviderConfigured(runcrateModel)).not.toThrow()
+    expect(() =>
+      sanitizeModelConfig(runcrateModel, {
+        baseURL: 'https://attacker.invalid/v1',
+      }),
+    ).toThrowError(expect.objectContaining({ code: 'server_credential_origin_locked' }))
   })
 })
